@@ -54,7 +54,7 @@
 			<div style="padding: 30px 0 0 50px">
 				<ul>
 					<li>录入两项信息与真实照片，可核对本人身份</li>
-					<li>收费标准：每次核验收费<span style="color:#FF0000">1</span>元</li>
+					<li>收费标准：每次核验收费<span style="color:#FF0000">{{扣除积分}}</span>元</li>
 				</ul>
 			</div>
 			<div class="weui-form__control-area">
@@ -160,14 +160,15 @@ var app = new Vue({
 
 		page: 0,
 		积分: 0,
+		扣除积分: 0,
 		ok: '',
 
-			a: {
-				realName: '',
-				identityCard: '',
-				liveImg: '',
-				liveImgCode: '',//仅预览用
-			}
+		a: {
+			realName: '',
+			identityCard: '',
+			liveImg: '',
+			liveImgCode: '',//仅预览用
+		}
 	},
 	methods:{
 
@@ -381,7 +382,7 @@ var app = new Vue({
 			WeixinJSBridge.invoke(
 				'getBrandWCPayRequest',
 				{
-					"appId":			json.appid,
+					"appId":		json.appid,
 					"timeStamp":	json.timestamp,
 					"nonceStr":		json.noncestr,
 					"package":		json.package,
@@ -578,6 +579,7 @@ var app = new Vue({
 				if(re.rspHead.retCode == '1'){
 					LS.商户编号 = re.rspBody.identifier
 					LS.扣除积分 = re.rspBody.payIntegral
+					_this.扣除积分 = re.rspBody.payIntegral
 				}
 			}
 		})
