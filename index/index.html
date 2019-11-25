@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=0.9, user-scalable=no">
+<meta name="keyword" content="">
+<meta name="description" content="">
+<meta name="author" content="lightuni.com">
+
+<title>中证宝人脸核验系统</title>
+
+<link rel="stylesheet" href="../css/all.css">
+<script src="../js/all.js"></script>
+
+<style>
+.page2{
+  background: url(../img/bg.jpg) center;
+  text-align: center;
+}
+.logo{
+  padding: 30px 0;
+}
+.cover{
+  position: absolute;
+  z-index: 999;
+  margin: 100px 0 0 230px;
+}
+.realName{
+  margin-top: 20px;
+  font-size: 32px;
+}
+.identityCard{
+  margin-top: 10px;
+  font-size: 22px;
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+
+	<div v-if="page == 0">
+		Loading ...
+	</div>
+
+
+	<div v-if="page == 1">
+
+		<form class="weui-form" action="__URL__/save" method="post">
+			<div class="weui-form__text-area">
+				<h2 class="weui-form__title">人脸核验</h2>
+			</div>
+			<div style="padding: 30px 0 0 50px">
+				<ul>
+					<li>录入两项信息与真实照片，可核对本人身份</li>
+					<li>收费标准：每次核验收费<span style="color:#FF0000">1</span>元</li>
+				</ul>
+			</div>
+			<div class="weui-form__control-area">
+				<div class="weui-cells__group weui-cells__group_form">
+					<div class="weui-cells weui-cells_form">
+
+						<div class="weui-cell">
+							<div class="weui-cell__hd"><label class="weui-label">真实姓名</label></div>
+							<div class="weui-cell__bd">
+								<input class="weui-input" placeholder="请输入真实姓名"
+								name="realName" v-model="a.realName">
+							</div>
+						</div>
+
+						<div class="weui-cell">
+							<div class="weui-cell__hd"><label class="weui-label">证件号码</label></div>
+							<div class="weui-cell__bd">
+								<input class="weui-input" placeholder="请输入18位证件号码"
+								name="identityCard" v-model="a.identityCard">
+							</div>
+						</div>
+
+						<div class="weui-cells weui-cells_form">
+							<div class="weui-cell">
+								<div class="weui-cell__bd">
+									<div class="weui-uploader">
+										<div class="weui-uploader__hd">
+											<p class="weui-uploader__title">上传照片</p>
+										</div>
+										<div class="weui-uploader__bd">
+											<ul class="weui-uploader__files" id="uploaderFiles" v-if="a.liveImgCode != ''">
+												<li class="weui-uploader__file" :style="`background-image:url(${a.liveImgCode})`"></li>
+											</ul>
+											<div class="weui-uploader__input-box" v-if="a.liveImgCode == ''">
+													<input class="weui-uploader__input"
+													type="file" accept="image/*" id="upload_input" @change="选图()">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+			<div class="weui-form__opr-area">
+				<a :class="`weui-btn weui-btn_${
+				a.realName != '' &&
+				a.identityCard != '' &&
+				a.liveImg != '' ?
+				'primary':'disabled'}`"
+				href="javascript:;" @click="检验()"
+				>核验</a>
+			</div>
+
+			<input type="hidden" name="liveImg" v-model="a.liveImg">
+		</form>
+
+	</div>
+
+
+	<div v-if="page == 2" class="page2">
+
+	  <div class="logo">
+	    <img src="../img/logo.png" width="80%">
+	  </div>
+
+	  <div class="img">
+	    <div class="cover">
+	      <img :src="`../img/${ok}.png`">
+	    </div>
+	    <img :src="`${a.liveImgCode}`" width="40%">
+	  </div>
+	  <div class="realName">{{a.realName}}</div>
+	  <div class="identityCard">{{a.identityCard}}</div>
+
+	  <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+	</div>
+
+
+	<div v-if="loading == 1">
+		<div class="weui-mask_transparent"></div>
+		<div class="weui-toast">
+			<i class="weui-loading weui-icon_toast"></i>
+			<p class="weui-toast__content">数据加载中</p>
+		</div>
+	</div>
+
+</div><!--app-->
+
+
+<script src="../js/exif.min.js"></script>
+<script>
+var app = new Vue({
+	el: '#app',
+	data:{
+
+		loading: 1,
+
+		a: {},
+
+		page: 0,
+		积分: 0,
+		ok: '',
+
+			a: {
+				realName: '',
+				identityCard: '',
+				liveImg: '',
+				liveImgCode: '',//仅预览用
+			}
+	},
+	methods:{
+
+
+		选图: function(){
+			var _this = this
+
+				var file = $('#upload_input')[0].files[0]
+				// console.log(file)
+
+				// 方向 1=0° 6=顺时针90° 8=逆时针90° 3=180°
+				var Orientation
+				EXIF.getData(file, function(){
+
+					Orientation = EXIF.getTag(this, 'Orientation')
+
+					//创建一个文件读取的工具类
+					var reader = new FileReader()
+
+					reader.onload = function(e){
+
+						// console.log(this.result)//原base64码
+
+						_this.压图(this.result, Orientation)
+					}
+
+					//告诉文件读取工具类读取那个文件
+					reader.readAsDataURL(file)
+
+				})
+		},
+		压图:function(src, Orientation){
+			var _this = this
+
+				// 需要压缩的最大尺寸
+				var MAX_SIZE = 500
+
+				//创建Image对象
+				var image = new Image()
+
+				image.src = src
+				image.onload = function(){
+
+					console.log('压前', image.width + ' x ' + image.height)
+
+					//宽大于高的情况
+					if (image.width > MAX_SIZE && image.width >= image.height){
+						image.height *= MAX_SIZE / image.width
+						image.width = MAX_SIZE
+					}
+					//宽小于高的情况
+					if (image.height > MAX_SIZE && image.height > image.width){
+						image.width *= MAX_SIZE / image.height
+						image.height = MAX_SIZE
+					}
+
+					console.log('压后', image.width + ' x ' + image.height)
+
+					var canvas = document.createElement("canvas")
+
+					//获取2d画布
+					var ctx = canvas.getContext("2d")
+					canvas.width = image.width
+					canvas.height = image.height
+
+					ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+					// 摆正
+					switch(Orientation){
+						case 6:// 旋转90度
+							canvas.width = image.height
+							canvas.height = image.width
+							ctx.rotate(Math.PI / 2)
+							ctx.drawImage(image, 0, -image.height, image.width, image.height)
+							break
+						case 3:// 旋转180度
+							ctx.rotate(Math.PI)
+							ctx.drawImage(image, -image.width, -image.height, image.width, image.height)
+							break
+						case 8:// 旋转-90度
+							canvas.width = image.height
+							canvas.height = image.width
+							ctx.rotate(3 * Math.PI / 2)
+							ctx.drawImage(image, -image.width, 0, image.width, image.height)
+							break
+						
+						default:
+							ctx.drawImage(image, 0, 0, image.width, image.height)
+							break
+					}
+
+					//生成base64码
+					var base64Code = canvas.toDataURL("image/jpeg")
+					_this.a.liveImgCode = base64Code
+
+					//丢掉 data:image/jpeg;base64,
+					var base64Code2 = base64Code.replace('data:image/jpeg;base64,', '')
+
+					//把base64码放入input
+					// $('input[name="liveImg"]').val(base64Code2)
+					_this.a.liveImg = base64Code2
+			}
+
+		},
+		检验: function(){
+			var _this = this
+
+			//不够分需要充值
+			if( (1 - this.积分) > 0 ){
+
+				var payMoney = 1 - this.积分
+
+				if(confirm('积分不足，需要充值' + payMoney + '积分')){
+
+					var data = {
+	"reqHead":{
+		"clientType":"1",
+		"appVersion":"1.0",
+		"osVersion":"安卓4.2.1",
+		"imei":"设备号",
+		"mobileModel":"S1",
+		"mobileManufacturer":"小米",
+		"identificationCode":"1212312",
+		"lat":"1",
+		"lng":"1",
+		"format":"json",
+		"version":"1.0",
+		"sign":"UCR1fIQ9lyUCR1fIQ9lyUCR1fIQ9lyUCR1y"
+	},
+	"reqBody":{
+		"memberId": LS.memberId,
+		"amount": payMoney,
+		"openId": LS.openId
+	}
+}
+
+					$.ajax({
+						type: 'POST',
+						url: api + 'zzb/app/h5WechatPurchase/interface',
+						data: JSON.stringify(data),
+						dataType: 'json',
+						success: function(re){
+							if(re.rspHead.retCode == '1'){
+								_this.微信支付(re.rspBody.payData)
+							}
+						}
+					})
+
+				}
+
+			}else{
+
+				//够积分
+				// console.log('积分够啦')
+
+				var data = {
+	"reqHead":{
+		"clientType":"1",
+		"appVersion":"1.0",
+		"osVersion":"安卓4.2.1",
+		"imei":"设备号",
+		"mobileModel":"S1",
+		"mobileManufacturer":"小米",
+		"identificationCode":"1212312",
+		"lat":"1",
+		"lng":"1",
+		"format":"json",
+		"version":"1.0",
+		"sign":"AF589D24291C386A925DF1430AFB38B7"
+	},
+	"reqBody":{
+		"identifier": LS.商户编号,
+		"memberId": LS.memberId,
+		"realName": this.a.realName,
+		"identityCard": this.a.identityCard,
+		"liveImg": this.a.liveImg
+	}
+}
+
+				$.ajax({
+					type: 'POST',
+					url: api + 'zzb/app/h5FaceRecognition/interface',
+					data: JSON.stringify(data),
+					dataType: 'json',
+					success: function(re){
+						if(re.rspHead.retCode == '1'){
+							_this.ok = 'pass'
+							
+						}else{
+							_this.ok = 'error'
+
+						}
+
+						_this.page = 2
+					}
+				})
+			}
+
+		},
+		微信支付(json){
+			var _this = this
+
+			// console.log(json)
+			// return
+
+			// this.单号 = json.orderNo
+
+			WeixinJSBridge.invoke(
+				'getBrandWCPayRequest',
+				{
+					"appId":			json.appid,
+					"timeStamp":	json.timestamp,
+					"nonceStr":		json.noncestr,
+					"package":		json.package,
+					"signType":		json.signType,
+					"paySign":		json.sign
+				},
+				function(re){
+
+					// alert(re.err_msg)
+
+					if(re.err_msg == "get_brand_wcpay_request:ok") {
+
+						_this.检查支付状态循环 = setInterval("_this.检查支付状态('" + json.orderNo + "')", 1000)
+						_this.检查支付状态次数 = 30
+
+					}else{
+
+						this.loading = 0
+					}
+				}
+			)
+		},
+		检查支付状态: function(单号){
+
+			var _this = this
+
+			//停止检查 - 次数够
+			if(this.检查支付状态次数 == 0){
+				
+				clearInterval(this.检查支付状态循环)
+				this.loading = 0
+
+				return
+			}
+
+			this.检查支付状态次数--
+
+			this.loading = 1
+
+			var data = {
+	"reqHead":{
+		"clientType":"1",
+		"appVersion":"1.0",
+		"osVersion":"安卓4.2.1",
+		"imei":"设备号",
+		"mobileModel":"S1",
+		"mobileManufacturer":"小米",
+		"identificationCode":"1212312",
+		"lat":"1",
+		"lng":"1",
+		"format":"json",
+		"version":"1.0",
+		"sign":"UCR1fIQ9lyUCR1fIQ9lyUCR1fIQ9lyUCR1y"
+	},
+	"reqBody":{
+		"orderNo": 单号
+	}
+}
+
+			$.ajax({
+				type: 'POST',
+				url: api + 'zzb/app/payResult/interface',
+				data: JSON.stringify(data),
+				dataType: 'json',
+				success: function(re){
+					console.log(re)
+
+					if(re.rspBody.resutl == 1){
+
+						//停止检查
+						clearInterval(_this.检查支付状态循环)
+						_this.loading = 0
+
+						//更新本地积分
+						_this.积分 = _this.积分 - 1
+
+						//再次发起购买
+						_this.检验()
+					}
+
+				}
+			})
+
+		},
+		关闭: function(){
+
+			WeixinJSBridge.invoke('closeWindow',{},function(res){})
+
+		}
+	},
+	created(){
+
+		var ua = navigator.userAgent
+		// alert(ua)
+
+		if(ua.indexOf('MicroMessenger') != -1){
+			this.客户端 = '微信'
+		}
+		if(ua.indexOf('Alipay') != -1){
+			this.客户端 = '支付宝'
+		}
+
+		if(this.客户端 == ''){
+			alert('请在中证宝APP、微信、支付宝扫码使用')
+			return
+		}
+
+		if(this.客户端 == '支付宝'){
+			alert('支付宝暂未开通')
+			return
+		}
+
+		// return
+
+		var _this = this
+
+		//清缓存
+		if(getUrl('clean') != undefined){
+			LS.removeItem('memberId')
+			LS.removeItem('openId')
+			LS.removeItem('userId')
+			LS.removeItem('套餐')
+			LS.removeItem('积分')
+		}
+
+		//商户号
+		if(getUrl('mchId') != undefined){
+			LS.商户号 = getUrl('mchId')
+		}
+
+		//未登录
+		if(location.href.indexOf('localhost') != -1){
+			// LS.openId = 'localhost'
+		}
+
+		if(LS.openId == undefined){
+
+			//step1 无code
+			if(getUrl('code') == undefined){
+				// console.log(location.href)
+				var url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxff6f6dabda86aec6&redirect_uri=' + encodeURIComponent(location.href) + '&response_type=code&scope=snsapi_base#wechat_redirect'
+				// console.log(url)
+				location.href = url
+				// return
+			}
+
+		}
+
+
+		var body = {
+			source: 2,
+			paramId: '',
+			code: ''
+		}
+		if(LS.openId != undefined){
+
+			//有openid 用 openid
+			body.paramId = LS.openId
+
+		}else if(getUrl('code') != null){
+
+			//无openid 用 code
+			body.code = getUrl('code')
+
+		}
+
+		//商户信息
+		var data = {
+	"reqHead":{
+		"clientType":"1",
+		"appVersion":"1.0",
+		"osVersion":"安卓4.2.1",
+		"imei":"设备号",
+		"mobileModel":"S1",
+		"mobileManufacturer":"小米",
+		"identificationCode":"1212312",
+		"lat":"1",
+		"lng":"1",
+		"format":"json",
+		"version":"1.0",
+		"sign":"UCR1fIQ9lyUCR1fIQ9lyUCR1fIQ9lyUCR1y"
+	},
+	"reqBody": {
+		"mchId": LS.商户号
+	}
+}
+
+		$.ajax({
+			type: 'POST',
+			url: api + 'zzb/app/mchInfo/interface',
+			data: JSON.stringify(data),
+			dataType: 'json',
+			success: function(re){
+				if(re.rspHead.retCode == '1'){
+					LS.商户编号 = re.rspBody.identifier
+				}
+			}
+		})
+
+
+		//用户信息
+		var data = {
+	"reqHead":{
+		"clientType":"1",
+		"appVersion":"1.0",
+		"osVersion":"安卓4.2.1",
+		"imei":"设备号",
+		"mobileModel":"S1",
+		"mobileManufacturer":"小米",
+		"identificationCode":"1212312",
+		"lat":"1",
+		"lng":"1",
+		"format":"json",
+		"version":"1.0",
+		"sign":"UCR1fIQ9lyUCR1fIQ9lyUCR1fIQ9lyUCR1y"
+	},
+	"reqBody": body
+}
+
+		$.ajax({
+			type: 'POST',
+			url: api + 'zzb/app/h5UserInfo/interface',
+			data: JSON.stringify(data),
+			dataType: 'json',
+			success: function(re){
+				if(re.rspHead.retCode == '1'){
+
+					// console.log(re.rspBody)
+
+					LS.积分		= re.rspBody.integral
+					LS.openId	= re.rspBody.openId
+					LS.memberId	= re.rspBody.memberId
+					LS.userId	= re.rspBody.userId
+
+					//更新积分
+					_this.积分 = Number(LS.积分)
+
+				}
+			}
+		})
+
+	},
+	mounted(){
+		_this = this
+
+		console.log('vue is ready')
+
+
+		this.page = 1
+
+		this.积分 = Number(LS.积分)
+
+		this.loading = 0
+
+	}
+})
+</script>
+</body>
+</html>
