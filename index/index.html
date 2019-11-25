@@ -159,7 +159,8 @@ var app = new Vue({
 		a: {},
 
 		page: 0,
-		积分: 0,
+		// 积分: 0,
+		充值积分: 0,
 		扣除积分: 0,
 		ok: '',
 
@@ -282,9 +283,9 @@ var app = new Vue({
 			//不够分需要充值
 			if( (LS.积分 - LS.扣除积分) < 0 ){
 
-				var 支付积分 = LS.扣除积分 - LS.积分
+				this.充值积分 = LS.扣除积分 - LS.积分
 
-				if(confirm('积分不足，需要充值' + 支付积分 + '积分')){
+				if(confirm('积分不足，需要充值' + this.充值积分 + '积分')){
 
 					var data = {
 	"reqHead":{
@@ -303,7 +304,7 @@ var app = new Vue({
 	},
 	"reqBody":{
 		"memberId": LS.memberId,
-		"amount": 支付积分,
+		"amount": this.充值积分,
 		"openId": LS.openId
 	}
 }
@@ -457,7 +458,7 @@ var app = new Vue({
 						_this.loading = 0
 
 						//更新本地积分
-						_this.积分 = _this.积分 - 1
+						LS.积分 = LS.积分 + _this.充值积分
 
 						//再次发起购买
 						_this.检验()
