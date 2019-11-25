@@ -275,12 +275,15 @@ var app = new Vue({
 		检验: function(){
 			var _this = this
 
+			// console.log(LS.积分)
+			// console.log(LS.扣除积分)
+
 			//不够分需要充值
-			if( (1 - this.积分) > 0 ){
+			if( (LS.积分 - LS.扣除积分) < 0 ){
 
-				var payMoney = 1 - this.积分
+				var 支付积分 = LS.扣除积分 - LS.积分
 
-				if(confirm('积分不足，需要充值' + payMoney + '积分')){
+				if(confirm('积分不足，需要充值' + 支付积分 + '积分')){
 
 					var data = {
 	"reqHead":{
@@ -299,7 +302,7 @@ var app = new Vue({
 	},
 	"reqBody":{
 		"memberId": LS.memberId,
-		"amount": payMoney,
+		"amount": 支付积分,
 		"openId": LS.openId
 	}
 }
@@ -574,6 +577,7 @@ var app = new Vue({
 			success: function(re){
 				if(re.rspHead.retCode == '1'){
 					LS.商户编号 = re.rspBody.identifier
+					LS.扣除积分 = re.rspBody.payIntegral
 				}
 			}
 		})
