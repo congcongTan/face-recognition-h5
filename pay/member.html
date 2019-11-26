@@ -41,7 +41,7 @@
 
 
 	<div v-if="page == 0">
-		Loading ...
+		loading ...
 	</div>
 
 
@@ -54,7 +54,7 @@
 			<div style="padding: 30px 0 0 50px">
 				<ul>
 					<li>录入两项信息与真实照片，可核对本人身份</li>
-					<li>收费标准：每次核验收费<span style="color:#FF0000">{{扣除积分}}</span>元 {{积分}}</li>
+					<li>收费标准：每次核验收费 <span style="color:#FF0000">{{扣除积分}}</span> 元</li>
 				</ul>
 			</div>
 			<div class="weui-form__control-area">
@@ -120,14 +120,14 @@
 	<div v-if="page == 2" class="page2">
 
 	  <div class="logo">
-	    <img src="../img/face/logo.png" width="80%">
+		<img src="../img/face/logo.png" width="80%">
 	  </div>
 
 	  <div class="img">
-	    <div class="cover">
-	      <img :src="`../img/face/${ok}.png`">
-	    </div>
-	    <img :src="`${a.liveImgCode}`" width="40%">
+		<div class="cover">
+		  <img :src="`../img/face/${ok}.png`">
+		</div>
+		<img :src="`${a.liveImgCode}`" width="40%">
 	  </div>
 	  <div class="realName">{{a.realName}}</div>
 	  <div class="identityCard">{{a.identityCard}}</div>
@@ -145,6 +145,29 @@
 		</div>
 	</div>
 
+	<div class="js_dialog" v-if="alert != ''">
+		<div class="weui-mask"></div>
+		<div class="weui-dialog">
+			<div class="weui-dialog__hd"><strong class="weui-dialog__title">{{alert.title ? alert.title:'提示'}}</strong></div>
+			<div class="weui-dialog__bd">{{alert.message}}</div>
+			<div class="weui-dialog__ft">
+
+				<a class="weui-dialog__btn weui-dialog__btn_default"
+				href="javascript:;"
+				@click="wx_close()">关闭</a>
+
+				<a class="weui-dialog__btn weui-dialog__btn_default"
+				href="javascript:;"
+				v-if="0"
+				@click="alert.alert = ''">关闭</a>
+
+				<a class="weui-dialog__btn weui-dialog__btn_primary"
+				:href="`${alert.jump}`"
+				v-if="alert.jump != undefined">主操作</a>
+			</div>
+		</div>
+	</div>
+
 </div><!--app-->
 
 
@@ -155,8 +178,7 @@ var app = new Vue({
 	data:{
 
 		loading: 1,
-
-		a: {},
+		alert: '',
 
 		page: 0,
 		积分: 0,
@@ -172,105 +194,113 @@ var app = new Vue({
 		}
 	},
 	methods:{
-
+		toast: function(json){
+			this.alert = json
+		},
+		toast_close: function(){
+			this.alert = ''
+		},
+		wx_close: function(){
+			WeixinJSBridge.invoke('closeWindow',{},function(res){})
+		},
 
 		选图: function(){
 			var _this = this
 
-				var file = $('#upload_input')[0].files[0]
-				// console.log(file)
+			var file = $('#upload_input')[0].files[0]
+			// console.log(file)
 
-				// 方向 1=0° 6=顺时针90° 8=逆时针90° 3=180°
-				var Orientation
-				EXIF.getData(file, function(){
+			// 方向 1=0° 6=顺时针90° 8=逆时针90° 3=180°
+			var Orientation
+			EXIF.getData(file, function(){
 
-					Orientation = EXIF.getTag(this, 'Orientation')
+				Orientation = EXIF.getTag(this, 'Orientation')
 
-					//创建一个文件读取的工具类
-					var reader = new FileReader()
+				//创建一个文件读取的工具类
+				var reader = new FileReader()
 
-					reader.onload = function(e){
+				reader.onload = function(e){
 
-						// console.log(this.result)//原base64码
+					// console.log(this.result)//原base64码
 
-						_this.压图(this.result, Orientation)
-					}
+					_this.压图(this.result, Orientation)
+				}
 
-					//告诉文件读取工具类读取那个文件
-					reader.readAsDataURL(file)
+				//告诉文件读取工具类读取那个文件
+				reader.readAsDataURL(file)
 
-				})
+			})
 		},
 		压图:function(src, Orientation){
 			var _this = this
 
-				// 需要压缩的最大尺寸
-				var MAX_SIZE = 500
+			// 需要压缩的最大尺寸
+			var MAX_SIZE = 500
 
-				//创建Image对象
-				var image = new Image()
+			//创建Image对象
+			var image = new Image()
 
-				image.src = src
-				image.onload = function(){
+			image.src = src
+			image.onload = function(){
 
-					console.log('压前', image.width + ' x ' + image.height)
+				console.log('压前', image.width + ' x ' + image.height)
 
-					//宽大于高的情况
-					if (image.width > MAX_SIZE && image.width >= image.height){
-						image.height *= MAX_SIZE / image.width
-						image.width = MAX_SIZE
-					}
-					//宽小于高的情况
-					if (image.height > MAX_SIZE && image.height > image.width){
-						image.width *= MAX_SIZE / image.height
-						image.height = MAX_SIZE
-					}
+				//宽大于高的情况
+				if (image.width > MAX_SIZE && image.width >= image.height){
+					image.height *= MAX_SIZE / image.width
+					image.width = MAX_SIZE
+				}
+				//宽小于高的情况
+				if (image.height > MAX_SIZE && image.height > image.width){
+					image.width *= MAX_SIZE / image.height
+					image.height = MAX_SIZE
+				}
 
-					console.log('压后', image.width + ' x ' + image.height)
+				console.log('压后', image.width + ' x ' + image.height)
 
-					var canvas = document.createElement("canvas")
+				var canvas = document.createElement("canvas")
 
-					//获取2d画布
-					var ctx = canvas.getContext("2d")
-					canvas.width = image.width
-					canvas.height = image.height
+				//获取2d画布
+				var ctx = canvas.getContext("2d")
+				canvas.width = image.width
+				canvas.height = image.height
 
-					ctx.clearRect(0, 0, canvas.width, canvas.height)
+				ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-					// 摆正
-					switch(Orientation){
-						case 6:// 旋转90度
-							canvas.width = image.height
-							canvas.height = image.width
-							ctx.rotate(Math.PI / 2)
-							ctx.drawImage(image, 0, -image.height, image.width, image.height)
-							break
-						case 3:// 旋转180度
-							ctx.rotate(Math.PI)
-							ctx.drawImage(image, -image.width, -image.height, image.width, image.height)
-							break
-						case 8:// 旋转-90度
-							canvas.width = image.height
-							canvas.height = image.width
-							ctx.rotate(3 * Math.PI / 2)
-							ctx.drawImage(image, -image.width, 0, image.width, image.height)
-							break
-						
-						default:
-							ctx.drawImage(image, 0, 0, image.width, image.height)
-							break
-					}
+				// 摆正
+				switch(Orientation){
+					case 6:// 旋转90度
+						canvas.width = image.height
+						canvas.height = image.width
+						ctx.rotate(Math.PI / 2)
+						ctx.drawImage(image, 0, -image.height, image.width, image.height)
+						break
+					case 3:// 旋转180度
+						ctx.rotate(Math.PI)
+						ctx.drawImage(image, -image.width, -image.height, image.width, image.height)
+						break
+					case 8:// 旋转-90度
+						canvas.width = image.height
+						canvas.height = image.width
+						ctx.rotate(3 * Math.PI / 2)
+						ctx.drawImage(image, -image.width, 0, image.width, image.height)
+						break
+					
+					default:
+						ctx.drawImage(image, 0, 0, image.width, image.height)
+						break
+				}
 
-					//生成base64码
-					var base64Code = canvas.toDataURL("image/jpeg")
-					_this.a.liveImgCode = base64Code
+				//生成base64码
+				var base64Code = canvas.toDataURL("image/jpeg")
+				_this.a.liveImgCode = base64Code
 
-					//丢掉 data:image/jpeg;base64,
-					var base64Code2 = base64Code.replace('data:image/jpeg;base64,', '')
+				//丢掉 data:image/jpeg;base64,
+				var base64Code2 = base64Code.replace('data:image/jpeg;base64,', '')
 
-					//把base64码放入input
-					// $('input[name="liveImg"]').val(base64Code2)
-					_this.a.liveImg = base64Code2
+				//把base64码放入input
+				// $('input[name="liveImg"]').val(base64Code2)
+				_this.a.liveImg = base64Code2
 			}
 
 		},
@@ -468,11 +498,6 @@ var app = new Vue({
 			})
 
 		},
-		关闭: function(){
-
-			WeixinJSBridge.invoke('closeWindow',{},function(res){})
-
-		}
 	},
 	created(){
 
@@ -487,12 +512,12 @@ var app = new Vue({
 		}
 
 		if(this.客户端 == ''){
-			alert('请在中证宝APP、微信、支付宝扫码使用')
+			this.alert({message:'请在中证宝APP、微信、支付宝扫码使用'})
 			return
 		}
 
 		if(this.客户端 == '支付宝'){
-			alert('支付宝暂未开通')
+			this.alert({message:'支付宝暂未开通'})
 			return
 		}
 
@@ -513,16 +538,11 @@ var app = new Vue({
 		if(getUrl('mchId') != undefined){
 			LS.商户号 = getUrl('mchId')
 		}else{
-			alert('商户未开通人脸核验服务')
-			$('.weui-btn').remove()
+			this.toast({message:'商户未开通人脸核验服务'})
 			return
 		}
 
 		//未登录
-		if(location.href.indexOf('localhost') != -1){
-			// LS.openId = 'localhost'
-		}
-
 		if(LS.openId == undefined){
 
 			//step1 无code
@@ -585,6 +605,8 @@ var app = new Vue({
 					LS.商户编号 = re.rspBody.identifier
 					LS.扣除积分 = re.rspBody.payIntegral
 					_this.扣除积分 = re.rspBody.payIntegral
+				}else{
+					_this.toast({message:re.rspHead.retMsg})
 				}
 			}
 		})
@@ -617,16 +639,16 @@ var app = new Vue({
 			success: function(re){
 				if(re.rspHead.retCode == '1'){
 
-					// console.log(re.rspBody)
-
 					LS.积分		= re.rspBody.integral
 					LS.openId	= re.rspBody.openId
 					LS.memberId	= re.rspBody.memberId
 					LS.userId	= re.rspBody.userId
 
 					//更新积分
-					_this.积分 = Number(LS.积分)
+					_this.积分 = LS.积分
 
+				}else{
+					_this.toast({message:re.rspHead.retMsg})
 				}
 			}
 		})
@@ -640,7 +662,7 @@ var app = new Vue({
 
 		this.page = 1
 
-		this.积分 = Number(LS.积分)
+		this.积分 = LS.积分
 
 		this.loading = 0
 
