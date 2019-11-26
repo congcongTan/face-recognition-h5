@@ -513,7 +513,8 @@ var app = new Vue({
 		if(getUrl('mchId') != undefined){
 			LS.商户号 = getUrl('mchId')
 		}else{
-			alert('未知商户号')
+			alert('商户未开通人脸核验服务')
+			$('.weui-btn').remove()
 			return
 		}
 
