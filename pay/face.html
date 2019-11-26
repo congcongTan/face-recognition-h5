@@ -14,7 +14,7 @@
 
 <style>
 .page2{
-  background: url(../img/bg.jpg) center;
+  background: url(../img/face/bg.jpg) center;
   text-align: center;
 }
 .logo{
@@ -54,7 +54,7 @@
 			<div style="padding: 30px 0 0 50px">
 				<ul>
 					<li>录入两项信息与真实照片，可核对本人身份</li>
-					<li>收费标准：每次核验收费<span style="color:#FF0000">{{扣除积分}}</span>元</li>
+					<li>收费标准：每次核验收费<span style="color:#FF0000">{{扣除积分}}</span>元 {{积分}}</li>
 				</ul>
 			</div>
 			<div class="weui-form__control-area">
@@ -120,12 +120,12 @@
 	<div v-if="page == 2" class="page2">
 
 	  <div class="logo">
-	    <img src="../img/logo.png" width="80%">
+	    <img src="../img/face/logo.png" width="80%">
 	  </div>
 
 	  <div class="img">
 	    <div class="cover">
-	      <img :src="`../img/${ok}.png`">
+	      <img :src="`../img/face/${ok}.png`">
 	    </div>
 	    <img :src="`${a.liveImgCode}`" width="40%">
 	  </div>
@@ -159,7 +159,7 @@ var app = new Vue({
 		a: {},
 
 		page: 0,
-		// 积分: 0,
+		积分: 0,
 		充值积分: 0,
 		扣除积分: 0,
 		ok: '',
@@ -451,7 +451,7 @@ var app = new Vue({
 				success: function(re){
 					console.log(re)
 
-					if(re.rspBody.resutl == 1){
+					if(re.rspBody.resutl == '1'){
 
 						//停止检查
 						clearInterval(_this.检查支付状态循环)
