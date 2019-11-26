@@ -308,11 +308,6 @@ var app = new Vue({
 		检验: function(){
 			var _this = this
 
-			// console.log(LS.积分)
-			// console.log(LS.扣除积分)
-
-			//免费次数
-
 			//不够分需要充值
 			if( (this.免费次数 <= 0) && ((LS.积分 - LS.扣除积分) < 0) ){
 
@@ -361,6 +356,8 @@ var app = new Vue({
 				//够积分
 				// console.log('积分够啦')
 
+				this.loading = 1
+
 				var data = {
 	"reqHead":{
 		"clientType":"1",
@@ -391,6 +388,9 @@ var app = new Vue({
 					data: JSON.stringify(data),
 					dataType: 'json',
 					success: function(re){
+
+						this.loading = 0
+
 						if(re.rspHead.retCode == '1'){
 							_this.ok = 'pass'
 							
