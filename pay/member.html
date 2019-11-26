@@ -512,6 +512,9 @@ var app = new Vue({
 		//商户号
 		if(getUrl('mchId') != undefined){
 			LS.商户号 = getUrl('mchId')
+		}else{
+			alert('未知商户号')
+			return
 		}
 
 		//未登录
