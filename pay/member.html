@@ -350,7 +350,7 @@ var app = new Vue({
 							if(re.rspHead.retCode == '1'){
 								_this.微信支付(re.rspBody.payData)
 							}else{
-								this.alert({message:re.rspHead.retMsg})
+								_this.toast({message:re.rspHead.retMsg})
 							}
 						}
 					})
@@ -433,7 +433,9 @@ var app = new Vue({
 
 					// alert(re.err_msg)
 
-					if(re.err_msg == "get_brand_wcpay_request:ok") {
+					if(re.err_msg == "get_brand_wcpay_request:ok"){
+
+						_this.loading = 1
 
 						_this.检查支付状态循环 = setInterval("_this.检查支付状态('" + json.orderNo + "')", 1000)
 						_this.检查支付状态次数 = 30
@@ -446,6 +448,8 @@ var app = new Vue({
 			)
 		},
 		检查支付状态: function(单号){
+
+			// alert('检查支付状态：' + 单号)
 
 			var _this = this
 
@@ -488,7 +492,8 @@ var app = new Vue({
 				data: JSON.stringify(data),
 				dataType: 'json',
 				success: function(re){
-					console.log(re)
+
+					// console.log(re)
 
 					if(re.rspBody.resutl == '1'){
 
@@ -533,12 +538,12 @@ var app = new Vue({
 		}
 
 		if(this.客户端 == ''){
-			this.alert({message:'请在中证宝APP、微信、支付宝扫码使用'})
+			this.toast({message:'请在中证宝APP、微信、支付宝扫码使用'})
 			return
 		}
 
 		if(this.客户端 == '支付宝'){
-			this.alert({message:'支付宝暂未开通'})
+			this.toast({message:'支付宝暂未开通'})
 			return
 		}
 
