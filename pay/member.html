@@ -362,7 +362,7 @@ var app = new Vue({
 						dataType: 'json',
 						success: function(re){
 
-							_this.debug('正在发起微信支付')
+							// _this.debug('正在发起微信支付')
 
 							if(re.rspHead.retCode == '1'){
 								_this.微信支付(re.rspBody.payData)
@@ -451,17 +451,17 @@ var app = new Vue({
 
 					if(re.err_msg == "get_brand_wcpay_request:ok"){
 
-						_this.debug('微信支付成功了！')
+						// _this.debug('检查支付状态循环：' + "_this.检查支付状态('" + json.orderNo + "')")
 
-						_this.debug('检查支付状态循环：' + "_this.检查支付状态('" + json.orderNo + "')")
-
-						_this.debug(JSON.stringify(json))
+						// _this.debug(JSON.stringify(json))
 
 						_this.loading = 1
 
 						_this.检查支付状态次数 = 30
 
-						_this.检查支付状态循环 = setInterval("_this.检查支付状态('" + json.orderNo + "')", 1000)
+						_this.检查支付状态循环 = setInterval(function(){
+							_this.检查支付状态(json.orderNo)
+						}, 1000)
 						
 
 					}else{
@@ -474,7 +474,7 @@ var app = new Vue({
 		检查支付状态: function(单号){
 			var _this = this
 
-			this.debug('检查支付状态：' + 单号 + ' 第' + this.检查支付状态次数 + '次')
+			this.debug('检查支付状态：' + 单号 + this.检查支付状态次数 + '次')
 
 			//停止检查 - 次数够
 			if(this.检查支付状态次数 == 0){
