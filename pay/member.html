@@ -565,29 +565,8 @@ var app = new Vue({
 		}
 
 
-		var body = {
-			source: 2,
-			paramId: '',
-			code: ''
-		}
-		if(LS.openId != undefined){
-
-			//有openid 用 openid
-			body.paramId = LS.openId
-
-		}else if(getUrl('code') != null){
-
-			//无openid 用 code
-			body.code = getUrl('code')
-		}else{
-
-			return
-		}
-
-		if(body.paramId != '' || body.code != ''){
-
-			//商户信息
-			var data = {
+		//商户信息
+		var data = {
 	"reqHead":{
 		"clientType":"1",
 		"appVersion":"1.0",
@@ -607,27 +586,44 @@ var app = new Vue({
 	}
 }
 
-			$.ajax({
-				type: 'POST',
-				url: api + 'zzb/app/mchInfo/interface',
-				data: JSON.stringify(data),
-				dataType: 'json',
-				success: function(re){
-					if(re.rspHead.retCode == '1'){
-						LS.商户编号 = re.rspBody.identifier
-						LS.扣除积分 = re.rspBody.payIntegral
-						_this.扣除积分 = re.rspBody.payIntegral
-					}else{
-						_this.toast({message:re.rspHead.retMsg})
-					}
+		$.ajax({
+			type: 'POST',
+			url: api + 'zzb/app/mchInfo/interface',
+			data: JSON.stringify(data),
+			dataType: 'json',
+			success: function(re){
+				if(re.rspHead.retCode == '1'){
+					LS.商户编号 = re.rspBody.identifier
+					LS.扣除积分 = re.rspBody.payIntegral
+					_this.扣除积分 = re.rspBody.payIntegral
+				}else{
+					_this.toast({message:re.rspHead.retMsg})
 				}
-			})
+			}
+		})
 
+
+
+		var body = {
+			source: 2,
+			paramId: '',
+			code: ''
+		}
+		if(LS.openId != undefined){
+
+			//有openid 用 openid
+			body.paramId = LS.openId
+
+		}else if(getUrl('code') != null){
+
+			//无openid 用 code
+			body.code = getUrl('code')
 		}
 
+		if( !(body.paramId == '' && body.code == '') ){
 
-		//用户信息
-		var data = {
+			//用户信息
+			var data = {
 	"reqHead":{
 		"clientType":"1",
 		"appVersion":"1.0",
@@ -645,34 +641,34 @@ var app = new Vue({
 	"reqBody": body
 }
 
-		$.ajax({
-			type: 'POST',
-			url: api + 'zzb/app/h5UserInfo/interface',
-			data: JSON.stringify(data),
-			dataType: 'json',
-			success: function(re){
-				if(re.rspHead.retCode == '1'){
+			$.ajax({
+				type: 'POST',
+				url: api + 'zzb/app/h5UserInfo/interface',
+				data: JSON.stringify(data),
+				dataType: 'json',
+				success: function(re){
+					if(re.rspHead.retCode == '1'){
 
-					LS.积分		= re.rspBody.integral
-					LS.openId	= re.rspBody.openId
-					LS.memberId	= re.rspBody.memberId
-					LS.userId	= re.rspBody.userId
+						LS.积分		= re.rspBody.integral
+						LS.openId	= re.rspBody.openId
+						LS.memberId	= re.rspBody.memberId
+						LS.userId	= re.rspBody.userId
 
-					//更新积分
-					_this.积分 = LS.积分
+						//更新积分
+						_this.积分 = LS.积分
 
-					//上次失败这次免费
-					if(re.rspBody.lastAuthStatus === 0){
+						//上次失败这次免费
+						if(re.rspBody.lastAuthStatus === 0){
 
-						setTimeout('_this.扣除积分 = 0', 1000)
+							setTimeout('_this.扣除积分 = 0', 1000)
+						}
+
+					}else{
+						_this.toast({message:re.rspHead.retMsg})
 					}
-
-				}else{
-					_this.toast({message:re.rspHead.retMsg})
 				}
-			}
-		})
-
+			})
+		}
 	},
 	mounted(){
 		_this = this
