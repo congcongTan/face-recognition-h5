@@ -504,7 +504,21 @@ var app = new Vue({
 
 		},
 	},
-	created(){
+	mounted(){
+		_this = this
+
+		console.log('vue is ready')
+
+
+		this.page = 1
+
+		this.积分 = LS.积分
+
+		this.loading = 0
+
+		console.log(appid);
+
+
 
 		var ua = navigator.userAgent
 		// alert(ua)
@@ -557,53 +571,18 @@ var app = new Vue({
 			if(getUrl('code') == undefined){
 				// console.log(location.href)
 				var url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + appid + '&redirect_uri=' + encodeURIComponent(location.href) + '&response_type=code&scope=snsapi_base#wechat_redirect'
+
 				// console.log(url)
-				location.href = url
 				// return
+
+				location.href = url
+				return
 			}
 
 		}
 
 
-		//商户信息
-		var data = {
-	"reqHead":{
-		"clientType":"1",
-		"appVersion":"1.0",
-		"osVersion":"安卓4.2.1",
-		"imei":"设备号",
-		"mobileModel":"S1",
-		"mobileManufacturer":"小米",
-		"identificationCode":"1212312",
-		"lat":"1",
-		"lng":"1",
-		"format":"json",
-		"version":"1.0",
-		"sign":"UCR1fIQ9lyUCR1fIQ9lyUCR1fIQ9lyUCR1y"
-	},
-	"reqBody": {
-		"mchId": LS.商户号
-	}
-}
-
-		$.ajax({
-			type: 'POST',
-			url: api + 'zzb/app/mchInfo/interface',
-			data: JSON.stringify(data),
-			dataType: 'json',
-			success: function(re){
-				if(re.rspHead.retCode == '1'){
-					LS.商户编号 = re.rspBody.identifier
-					LS.扣除积分 = re.rspBody.payIntegral
-					_this.扣除积分 = re.rspBody.payIntegral
-				}else{
-					_this.toast({message:re.rspHead.retMsg})
-				}
-			}
-		})
-
-
-
+		//用户信息
 		var body = {
 			source: 2,
 			paramId: '',
@@ -622,7 +601,7 @@ var app = new Vue({
 
 		if( !(body.paramId == '' && body.code == '') ){
 
-			//用户信息
+			
 			var data = {
 	"reqHead":{
 		"clientType":"1",
@@ -669,20 +648,43 @@ var app = new Vue({
 				}
 			})
 		}
+
+		//商户信息
+		var data = {
+	"reqHead":{
+		"clientType":"1",
+		"appVersion":"1.0",
+		"osVersion":"安卓4.2.1",
+		"imei":"设备号",
+		"mobileModel":"S1",
+		"mobileManufacturer":"小米",
+		"identificationCode":"1212312",
+		"lat":"1",
+		"lng":"1",
+		"format":"json",
+		"version":"1.0",
+		"sign":"UCR1fIQ9lyUCR1fIQ9lyUCR1fIQ9lyUCR1y"
 	},
-	mounted(){
-		_this = this
+	"reqBody": {
+		"mchId": LS.商户号
+	}
+}
 
-		console.log('vue is ready')
-
-
-		this.page = 1
-
-		this.积分 = LS.积分
-
-		this.loading = 0
-
-		console.log(appid);
+		$.ajax({
+			type: 'POST',
+			url: api + 'zzb/app/mchInfo/interface',
+			data: JSON.stringify(data),
+			dataType: 'json',
+			success: function(re){
+				if(re.rspHead.retCode == '1'){
+					LS.商户编号 = re.rspBody.identifier
+					LS.扣除积分 = re.rspBody.payIntegral
+					_this.扣除积分 = re.rspBody.payIntegral
+				}else{
+					_this.toast({message:re.rspHead.retMsg})
+				}
+			}
+		})
 
 	}
 })
