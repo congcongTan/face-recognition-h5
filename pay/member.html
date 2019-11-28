@@ -539,6 +539,7 @@ var app = new Vue({
 			LS.removeItem('商户编号')
 			LS.removeItem('扣除积分')
 			LS.removeItem('积分')
+			return
 		}
 
 		//商户号
@@ -578,7 +579,9 @@ var app = new Vue({
 
 			//无openid 用 code
 			body.code = getUrl('code')
+		}else{
 
+			return
 		}
 
 		if(body.paramId != '' || body.code != ''){
