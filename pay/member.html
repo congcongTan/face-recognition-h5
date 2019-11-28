@@ -54,7 +54,10 @@
 			<div style="padding: 30px 0 0 50px">
 				<ul>
 					<li>录入两项信息与真实照片，可核对本人身份</li>
-					<li>收费标准：每次核验收费 <span style="color:#FF0000">{{扣除积分}}</span> 元</li>
+					<li>收费标准：
+						<span v-if="本次收费 === 1">每次核验收费 <span style="color:#FF0000">{{扣除积分}}</span> 元</span>
+						<span v-if="本次收费 === 0">本次核验不收取费用</span>
+					</li>
 				</ul>
 			</div>
 			<div class="weui-form__control-area">
@@ -184,6 +187,7 @@ var app = new Vue({
 		积分: 0,
 		充值积分: 0,
 		扣除积分: 0,
+		本次收费: 1,
 		ok: '',
 
 		a: {
@@ -309,7 +313,7 @@ var app = new Vue({
 
 			//不够分需要充值
 			var 还剩积分 = ((LS.积分 * 100) - (LS.扣除积分 * 100)) / 100
-			if( 还剩积分 < 0 ){
+			if( this.本次收费 === 1 && 还剩积分 < 0 ){
 
 				this.充值积分 = - 还剩积分
 
@@ -636,10 +640,7 @@ var app = new Vue({
 						_this.积分 = LS.积分
 
 						//上次失败这次免费
-						if(re.rspBody.lastAuthStatus === 0){
-
-							setTimeout('_this.扣除积分 = 0', 1000)
-						}
+						_this.本次收费 = re.rspBody.lastAuthStatus
 
 					}else{
 						_this.toast({message:re.rspHead.retMsg})
