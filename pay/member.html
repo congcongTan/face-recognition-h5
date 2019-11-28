@@ -431,8 +431,7 @@ var app = new Vue({
 		微信支付(json){
 			var _this = this
 
-			// console.log(json)
-			// return
+			_this.debug('微信支付的json是：' + JSON.stringify(json))
 
 			// this.单号 = json.orderNo
 
@@ -448,11 +447,13 @@ var app = new Vue({
 				},
 				function(re){
 
-					_this.debug('微信支付返回:' + re.err_msg)
+					_this.debug('微信支付返回：' + JSON.stringify(re))
 
 					if(re.err_msg == "get_brand_wcpay_request:ok"){
 
-						_this.debug('检查支付状态循环:' + "_this.检查支付状态('" + json.orderNo + "')")
+						_this.debug('微信支付成功了！')
+
+						_this.debug('检查支付状态循环：' + "_this.检查支付状态('" + json.orderNo + "')")
 
 						_this.debug(JSON.stringify(json))
 
