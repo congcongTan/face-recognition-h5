@@ -33,12 +33,21 @@
   margin-top: 10px;
   font-size: 22px;
 }
+.debug{
+	position: fixed;
+	z-index: 99999;
+}
 </style>
 </head>
 <body>
 
 <div id="app">
 
+
+	<div class="debug">
+		debug:<br>
+		用户余额：{{积分}}<br>
+	</div>
 
 	<div v-if="page == 0">
 		loading ...
@@ -208,6 +217,11 @@ var app = new Vue({
 			WeixinJSBridge.invoke('closeWindow',{},function(res){})
 		},
 
+		deubg: function(log){
+
+			$('.debug').html( $('.debug').html() + log + '<br>' )
+		},
+
 		选图: function(){
 			var _this = this
 
@@ -247,7 +261,7 @@ var app = new Vue({
 			image.src = src
 			image.onload = function(){
 
-				console.log('压前', image.width + ' x ' + image.height)
+				// _this.deubg('压前：' + image.width + ' x ' + image.height)
 
 				//宽大于高的情况
 				if (image.width > MAX_SIZE && image.width >= image.height){
@@ -260,7 +274,7 @@ var app = new Vue({
 					image.height = MAX_SIZE
 				}
 
-				console.log('压后', image.width + ' x ' + image.height)
+				// _this.deubg('压后：' + image.width + ' x ' + image.height)
 
 				var canvas = document.createElement("canvas")
 
@@ -431,7 +445,7 @@ var app = new Vue({
 				},
 				function(re){
 
-					// alert(re.err_msg)
+					_this.debug('微信支付返回' + re.err_msg)
 
 					if(re.err_msg == "get_brand_wcpay_request:ok"){
 
@@ -448,10 +462,9 @@ var app = new Vue({
 			)
 		},
 		检查支付状态: function(单号){
-
-			// alert('检查支付状态：' + 单号)
-
 			var _this = this
+
+			this.debug('检查支付状态：' + 单号 + ' 第' + this.检查支付状态次数 + '次')
 
 			//停止检查 - 次数够
 			if(this.检查支付状态次数 == 0){
@@ -463,8 +476,6 @@ var app = new Vue({
 			}
 
 			this.检查支付状态次数--
-
-			this.loading = 1
 
 			var data = {
 	"reqHead":{
@@ -494,6 +505,7 @@ var app = new Vue({
 				success: function(re){
 
 					// console.log(re)
+					_this.debug('payResult返回：' + re.rspBody.resutl)
 
 					if(re.rspBody.resutl == '1'){
 
