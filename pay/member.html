@@ -579,8 +579,10 @@ var app = new Vue({
 
 		}
 
-		//商户信息
-		var data = {
+		if(body.paramId != '' || body.code ！= ''){
+
+			//商户信息
+			var data = {
 	"reqHead":{
 		"clientType":"1",
 		"appVersion":"1.0",
@@ -600,21 +602,23 @@ var app = new Vue({
 	}
 }
 
-		$.ajax({
-			type: 'POST',
-			url: api + 'zzb/app/mchInfo/interface',
-			data: JSON.stringify(data),
-			dataType: 'json',
-			success: function(re){
-				if(re.rspHead.retCode == '1'){
-					LS.商户编号 = re.rspBody.identifier
-					LS.扣除积分 = re.rspBody.payIntegral
-					_this.扣除积分 = re.rspBody.payIntegral
-				}else{
-					_this.toast({message:re.rspHead.retMsg})
+			$.ajax({
+				type: 'POST',
+				url: api + 'zzb/app/mchInfo/interface',
+				data: JSON.stringify(data),
+				dataType: 'json',
+				success: function(re){
+					if(re.rspHead.retCode == '1'){
+						LS.商户编号 = re.rspBody.identifier
+						LS.扣除积分 = re.rspBody.payIntegral
+						_this.扣除积分 = re.rspBody.payIntegral
+					}else{
+						_this.toast({message:re.rspHead.retMsg})
+					}
 				}
-			}
-		})
+			})
+
+		}
 
 
 		//用户信息
@@ -677,7 +681,7 @@ var app = new Vue({
 
 		this.loading = 0
 
-		alert(appid);
+		console.log(appid);
 
 	}
 })
