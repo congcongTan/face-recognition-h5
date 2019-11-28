@@ -181,7 +181,6 @@ var app = new Vue({
 		alert: '',
 
 		page: 0,
-		免费次数: 5,
 		积分: 0,
 		充值积分: 0,
 		扣除积分: 0,
@@ -310,7 +309,7 @@ var app = new Vue({
 
 			//不够分需要充值
 			var 还剩积分 = ((LS.积分 * 100) - (LS.扣除积分 * 100)) / 100
-			if( (this.免费次数 <= 0) && (还剩积分 < 0) ){
+			if( 还剩积分 < 0 ){
 
 				this.充值积分 = - 还剩积分
 
@@ -647,10 +646,15 @@ var app = new Vue({
 					LS.openId	= re.rspBody.openId
 					LS.memberId	= re.rspBody.memberId
 					LS.userId	= re.rspBody.userId
-					_this.免费次数	-= re.rspBody.authNum
 
 					//更新积分
 					_this.积分 = LS.积分
+
+					//上次失败这次免费
+					if(re.rspBody.lastAuthStatus === 0){
+
+						setTimeout('_this.扣除积分 = 0', 1000)
+					}
 
 				}else{
 					_this.toast({message:re.rspHead.retMsg})
