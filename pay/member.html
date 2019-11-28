@@ -44,7 +44,7 @@
 <div id="app">
 
 
-	<div class="debug">
+	<div class="debug" style="display: none;">
 		debug:<br>
 		用户余额：{{积分}}<br>
 	</div>
@@ -123,7 +123,7 @@
 				>核验</a>
 			</div>
 
-			<a class="weui-btn weui-btn_primary" @click="test()">test</a>
+			<!-- <a class="weui-btn weui-btn_primary" @click="test()">test</a> -->
 
 			<input type="hidden" name="liveImg" v-model="a.liveImg">
 		</form>
@@ -475,7 +475,7 @@ var app = new Vue({
 				}
 			)
 		},
-		test: function(){
+/*		test: function(){
 			var _this = this
 
 			_this.loading = 1
@@ -486,7 +486,7 @@ var app = new Vue({
 				_this.检查支付状态('48c27077e577443ba8f46cd49453ad65')
 			}, 1000)
 
-		},
+		},*/
 		检查支付状态: function(单号){
 			var _this = this
 
