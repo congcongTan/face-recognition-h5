@@ -588,6 +588,7 @@ var app = new Vue({
 			paramId: '',
 			code: ''
 		}
+
 		if(LS.openId != undefined){
 
 			//有openid 用 openid
@@ -616,6 +617,10 @@ var app = new Vue({
 			"reqBody": body
 		}
 
+		var openid = LS.openId
+		var code = getUrl('code')
+		alert(openid +"--"+code)
+		
 		if( body.paramId != ''){
 
 			alert(body.paramId + ' | ' + body.code)
