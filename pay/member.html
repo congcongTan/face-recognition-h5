@@ -309,9 +309,10 @@ var app = new Vue({
 			var _this = this
 
 			//不够分需要充值
-			if( (this.免费次数 <= 0) && ((LS.积分 - LS.扣除积分) < 0) ){
+			var 还剩积分 = ((LS.积分 * 100) - (LS.扣除积分 * 100)) / 100
+			if( (this.免费次数 <= 0) && (还剩积分 < 0) ){
 
-				this.充值积分 = LS.扣除积分 - LS.积分
+				this.充值积分 = - 还剩积分
 
 				if(confirm('积分不足，需要充值' + this.充值积分 + '积分')){
 
@@ -551,7 +552,7 @@ var app = new Vue({
 			//step1 无code
 			if(getUrl('code') == undefined){
 				// console.log(location.href)
-				var url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxff6f6dabda86aec6&redirect_uri=' + encodeURIComponent(location.href) + '&response_type=code&scope=snsapi_base#wechat_redirect'
+				var url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + appid + '&redirect_uri=' + encodeURIComponent(location.href) + '&response_type=code&scope=snsapi_base#wechat_redirect'
 				// console.log(url)
 				location.href = url
 				// return
