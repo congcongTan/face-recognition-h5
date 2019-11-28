@@ -217,7 +217,7 @@ var app = new Vue({
 			WeixinJSBridge.invoke('closeWindow',{},function(res){})
 		},
 
-		deubg: function(log){
+		debug: function(log){
 
 			$('.debug').html( $('.debug').html() + log + '<br>' )
 		},
@@ -261,7 +261,7 @@ var app = new Vue({
 			image.src = src
 			image.onload = function(){
 
-				// _this.deubg('压前：' + image.width + ' x ' + image.height)
+				_this.debug('压前：' + image.width + ' x ' + image.height)
 
 				//宽大于高的情况
 				if (image.width > MAX_SIZE && image.width >= image.height){
@@ -274,7 +274,7 @@ var app = new Vue({
 					image.height = MAX_SIZE
 				}
 
-				// _this.deubg('压后：' + image.width + ' x ' + image.height)
+				_this.debug('压后：' + image.width + ' x ' + image.height)
 
 				var canvas = document.createElement("canvas")
 
@@ -361,6 +361,9 @@ var app = new Vue({
 						data: JSON.stringify(data),
 						dataType: 'json',
 						success: function(re){
+
+							_this.debug('正在发起微信支付')
+
 							if(re.rspHead.retCode == '1'){
 								_this.微信支付(re.rspBody.payData)
 							}else{
