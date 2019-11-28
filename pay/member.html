@@ -598,29 +598,28 @@ var app = new Vue({
 			//无openid 用 code
 			body.code = getUrl('code')
 		}
+		var data = {
+			"reqHead":{
+				"clientType":"1",
+				"appVersion":"1.0",
+				"osVersion":"安卓4.2.1",
+				"imei":"设备号",
+				"mobileModel":"S1",
+				"mobileManufacturer":"小米",
+				"identificationCode":"1212312",
+				"lat":"1",
+				"lng":"1",
+				"format":"json",
+				"version":"1.0",
+				"sign":"UCR1fIQ9lyUCR1fIQ9lyUCR1fIQ9lyUCR1y"
+			},
+			"reqBody": body
+		}
 
-		if( !(body.paramId == '' && body.code == '') ){
+		if( body.paramId != ''){
 
 			alert(body.paramId + ' | ' + body.code)
 			
-			var data = {
-	"reqHead":{
-		"clientType":"1",
-		"appVersion":"1.0",
-		"osVersion":"安卓4.2.1",
-		"imei":"设备号",
-		"mobileModel":"S1",
-		"mobileManufacturer":"小米",
-		"identificationCode":"1212312",
-		"lat":"1",
-		"lng":"1",
-		"format":"json",
-		"version":"1.0",
-		"sign":"UCR1fIQ9lyUCR1fIQ9lyUCR1fIQ9lyUCR1y"
-	},
-	"reqBody": body
-}
-
 			$.ajax({
 				type: 'POST',
 				url: api + 'zzb/app/h5UserInfo/interface',
@@ -648,6 +647,36 @@ var app = new Vue({
 					}
 				}
 			})
+		} else if(body.code != '') {
+			$.ajax({
+				type: 'POST',
+				url: api + 'zzb/app/h5UserInfo/interface',
+				data: JSON.stringify(data),
+				dataType: 'json',
+				success: function(re){
+					if(re.rspHead.retCode == '1'){
+
+						LS.积分		= re.rspBody.integral
+						LS.openId	= re.rspBody.openId
+						LS.memberId	= re.rspBody.memberId
+						LS.userId	= re.rspBody.userId
+
+						//更新积分
+						_this.积分 = LS.积分
+
+						//上次失败这次免费
+						if(re.rspBody.lastAuthStatus === 0){
+
+							setTimeout('_this.扣除积分 = 0', 1000)
+						}
+
+					}else{
+						_this.toast({message:re.rspHead.retMsg})
+					}
+				}
+			})
+		} else {
+			alert("99999999999");
 		}
 
 		//商户信息
