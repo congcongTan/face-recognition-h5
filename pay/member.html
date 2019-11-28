@@ -56,7 +56,7 @@
 
 	<div v-if="page == 1">
 
-		<form class="weui-form" action="__URL__/save" method="post">
+		<form class="weui-form">
 			<div class="weui-form__text-area">
 				<h2 class="weui-form__title">人脸核验</h2>
 			</div>
@@ -122,6 +122,8 @@
 				href="javascript:;" @click="检验()"
 				>核验</a>
 			</div>
+
+			<a class="weui-btn weui-btn_primary" @click="test()">test</a>
 
 			<input type="hidden" name="liveImg" v-model="a.liveImg">
 		</form>
@@ -451,6 +453,8 @@ var app = new Vue({
 
 					if(re.err_msg == "get_brand_wcpay_request:ok"){
 
+						// _this.debug('微信支付成功了！')
+
 						// _this.debug('检查支付状态循环：' + "_this.检查支付状态('" + json.orderNo + "')")
 
 						// _this.debug(JSON.stringify(json))
@@ -471,10 +475,22 @@ var app = new Vue({
 				}
 			)
 		},
+		test: function(){
+			var _this = this
+
+			_this.loading = 1
+
+			_this.检查支付状态次数 = 30
+
+			_this.检查支付状态循环 = setInterval(function(){
+				_this.检查支付状态('48c27077e577443ba8f46cd49453ad65')
+			}, 1000)
+
+		},
 		检查支付状态: function(单号){
 			var _this = this
 
-			this.debug('检查支付状态：' + 单号 + this.检查支付状态次数 + '次')
+			this.debug('检查支付状态：' + 单号 + ' 第' + this.检查支付状态次数 + '次')
 
 			//停止检查 - 次数够
 			if(this.检查支付状态次数 == 0){
