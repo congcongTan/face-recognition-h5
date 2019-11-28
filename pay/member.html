@@ -345,6 +345,8 @@ var app = new Vue({
 						success: function(re){
 							if(re.rspHead.retCode == '1'){
 								_this.微信支付(re.rspBody.payData)
+							}else{
+								this.alert({message:re.rspHead.retMsg})
 							}
 						}
 					})
