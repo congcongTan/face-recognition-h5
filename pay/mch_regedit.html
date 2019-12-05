@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=0.9, user-scalable=no">
+<meta name="keyword" content="">
+<meta name="description" content="">
+<meta name="author" content="lightuni.com">
+
+<title>中证宝人脸核验系统</title>
+
+<link rel="stylesheet" href="../css/all.css">
+<script src="../js/all.js"></script>
+
+<style>
+
+</style>
+</head>
+<body>
+
+<div id="app">
+
+	<div class="debug" style="dis play: none;">
+		debug:<br>
+	</div>
+
+	<div class="debug" style="display: none;">
+		debug:<br>
+	</div>
+
+	<div v-if="page == 0">
+		loading ...
+	</div>
+
+	<div v-if="page == 1">
+
+		<form class="weui-form">
+			<div class="weui-form__text-area">
+				<h2 class="weui-form__title">注册新账号</h2>
+			</div>
+			<div class="weui-form__control-area">
+				<div class="weui-cells__group weui-cells__group_form">
+					<div class="weui-cells weui-cells_form">
+
+						<div class="weui-cell">
+							<div class="weui-cell__hd"><label class="weui-label">商户名称</label></div>
+							<div class="weui-cell__bd">
+								<input class="weui-input" placeholder="可以是姓名、公司或集团名称"
+								type="text" name="title" v-model="a.title">
+							</div>
+						</div>
+
+						<div class="weui-cell">
+							<div class="weui-cell__hd"><label class="weui-label">手机号码</label></div>
+							<div class="weui-cell__bd">
+								<input class="weui-input" placeholder="请输入可以联系到您的手机号"
+								type="number" name="mobile" v-model="a.mobile">
+							</div>
+						</div>
+
+						<div class="weui-cell">
+							<div class="weui-cell__hd"><label class="weui-label">登录账号</label></div>
+							<div class="weui-cell__bd">
+								<input class="weui-input" placeholder="请输入登录账号"
+								type="text" name="identifier" v-model="a.identifier">
+							</div>
+						</div>
+
+						<div class="weui-cell">
+							<div class="weui-cell__hd"><label class="weui-label">登录密码</label></div>
+							<div class="weui-cell__bd">
+								<input class="weui-input" placeholder="请输入登录密码"
+								type="password" name="password" v-model="a.password">
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+			<div class="mb30">
+				<a :class="`weui-btn weui-btn_${
+				a.title != '' &&
+				a.mobile != '' &&
+				a.identifier != '' &&
+				a.password != '' ?
+				'primary':'disabled'}`"
+				href="javascript:;" @click="注册()"
+				>注册</a>
+			</div>
+			<div class="weui-form__tips-area">
+		      	<p class="weui-form__tips">
+		        	<a href="mch_login.html">已有账号，我要登录</a>
+		      	</p>
+		    </div>
+		</form>
+
+	</div>
+
+
+	<div v-if="loading == 1">
+		<div class="weui-mask_transparent"></div>
+		<div class="weui-toast">
+			<i class="weui-loading weui-icon_toast"></i>
+			<p class="weui-toast__content">数据加载中</p>
+		</div>
+	</div>
+
+	<div class="js_dialog" v-if="alert != ''">
+		<div class="weui-mask"></div>
+		<div class="weui-dialog">
+			<div class="weui-dialog__hd"><strong class="weui-dialog__title">{{alert.title ? alert.title:'提示'}}</strong></div>
+			<div class="weui-dialog__bd">{{alert.message}}</div>
+			<div class="weui-dialog__ft">
+
+				<a class="weui-dialog__btn weui-dialog__btn_default"
+				href="javascript:;"
+				v-if="alert.close == 'wx'"
+				@click="wx_close()">关闭</a>
+
+				<a class="weui-dialog__btn weui-dialog__btn_default"
+				href="javascript:;"
+				v-if="alert.close == undefined"
+				@click="alert = ''">关闭</a>
+
+				<a class="weui-dialog__btn weui-dialog__btn_primary"
+				:href="`${alert.jump}`"
+				v-if="alert.jump != undefined">主操作</a>
+			</div>
+		</div>
+	</div>
+
+</div><!--app-->
+
+
+<script>
+var app = new Vue({
+	el: '#app',
+	data:{
+		page: 0,
+		loading: 1,
+		alert: '',
+
+		a: {
+			title: '',
+			mobile: '',
+			identifier: '',
+			password: '',
+		}
+	},
+	methods:{
+		toast: function(json){
+			this.alert = json
+		},
+		toast_close: function(){
+			this.alert = ''
+		},
+		wx_close: function(){
+			WeixinJSBridge.invoke('closeWindow',{},function(res){})
+		},
+		debug: function(log){
+			$('.debug').html( $('.debug').html() + log + '<br>' )
+		},
+
+		注册: function(){
+			var _this = this
+
+			var data = {
+	"reqHead":{
+		"clientType":"1",
+		"appVersion":"1.0",
+		"osVersion":"安卓4.2.1",
+		"imei":"设备号",
+		"mobileModel":"S1",
+		"mobileManufacturer":"小米",
+		"identificationCode":"1212312",
+		"lat":"1",
+		"lng":"1",
+		"format":"json",
+		"version":"3.0",
+	},
+	"reqBody":this.a
+}
+
+			// 合并对象
+			var obj = Object.assign(
+				JSON.parse(JSON.stringify(data.reqHead)),
+				JSON.parse(JSON.stringify(data.reqBody))
+			)
+
+			// 键排序
+			var keys = Object.keys(obj).sort()
+
+			// 拼接字符
+			var str = ''
+			for (var i = 0; i < keys.length; i++) {
+				var k = keys[i]
+				if(obj[k] == '')continue
+				str += k + obj[k]
+			}
+
+			// 算好加入
+			data.reqHead.sign = md5(str + 'E9WQ3REJ34TG23MC3')
+
+			$.ajax({
+				type: 'POST',
+				url: api + 'zzb/app/mchRegister/interface',
+				data: JSON.stringify(data),
+				dataType: 'json',
+				success: function(re){
+
+					if(re.rspHead.retCode == '1'){
+
+						LS.title		= re.rspBody.title
+						LS.identifier	= re.rspBody.identifier
+						LS.mchId		= re.rspBody.mchId
+
+						location.href = 'mch.html'
+
+					}else{
+						_this.toast({message:re.rspHead.retMsg})
+					}
+				}
+			})
+		}
+
+	},
+	mounted(){
+		_this = this
+
+		console.log('vue is ready')
+
+
+		this.page = 1
+
+		this.loading = 0
+
+	}
+})
+</script>
+</body>
+</html>

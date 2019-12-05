@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=0.9, user-scalable=no">
+<meta name="keyword" content="">
+<meta name="description" content="">
+<meta name="author" content="lightuni.com">
+
+<title>中证宝人脸核验系统</title>
+
+<link rel="stylesheet" href="../css/all.css">
+<script src="../js/all.js"></script>
+
+<style>
+.items{
+	margin-left: -15px;
+}
+.items:after{
+	display: block;
+	content: " ";
+	clear: both;
+}
+.item{
+	float: left;
+	width: 45%;
+	border: 1px solid #CCC;
+	border-radius: 5px;
+	margin: 0 0 15px 15px;
+	padding: 15px 0;
+	text-align: center;
+}
+.item.active{
+	background: #ecf4fe;
+	border: 1px solid #4695f6;
+}
+
+.number {
+	display: flex
+}
+.number>div {
+	flex: 1;
+	background: url(../img/ball.png) center no-repeat;
+	background-size: 50px;
+	height: 50px;
+	line-height: 50px;
+	color: #FFF;
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+	<div class="debug" style="dis play: none;">
+		debug:<br>
+	</div>
+
+	<div class="debug" style="display: none;">
+		debug:<br>
+	</div>
+
+	<div v-if="page == 0">
+		loading ...
+	</div>
+
+	<div v-if="page == 1">
+
+		<div class="weui-navbar">
+			<div class="weui-navbar__item weui-bar__item_on">
+				<a href="mch.html">人脸核验</a>
+			</div>
+			<div class="weui-navbar__item">
+				<a href="mch_recharge.html">我要充值</a>
+			</div>
+		</div>
+
+		<div class="p15">
+
+			请选择以下商品进行充值<br>
+			当前余额：<span style="color:#FF0000">{{mchIntegral}}</span>
+
+			<hr style="margin: 15px 0">
+
+			<div class="items">
+				<div :class="`item${list_active == i ? ' active':''}`"
+				v-for="(v,i) in list"
+				@click="list_active = i">
+					<div>{{v.title}}</div>
+					<div>售价：<span style="color:#F00">￥{{v.price}}</span></div>
+				</div>
+			</div>
+
+			<hr>
+			<br>
+
+		</div>
+
+		<div class="weui-form__opr-area">
+			<a class="weui-btn weui-btn_primary"
+			href="javascript:;" @click="充值()"
+			>充值</a>
+		</div>
+
+	</div>
+
+	<div v-if="page == 2">
+
+		<div class="weui-navbar">
+			<div class="weui-navbar__item">
+				<a href="mch.html">人脸核验</a>
+			</div>
+			<div class="weui-navbar__item weui-bar__item_on">
+				<a href="mch_recharge.html">我要充值</a>
+			</div>
+		</div>
+
+		<div class="p15">
+
+			<h3>恭喜充值成功</h3>
+
+			本次充值商品：充100送20<br>
+			充值后余额：200
+
+			<hr style="margin-top:15px;">
+
+		</div>
+
+		<div class="weui-form__opr-area">
+			<a class="weui-btn weui-btn_primary"
+			href="mch.html"
+			>去人脸核验</a>
+		</div>
+
+	</div>
+
+
+	<div v-if="loading == 1">
+		<div class="weui-mask_transparent"></div>
+		<div class="weui-toast">
+			<i class="weui-loading weui-icon_toast"></i>
+			<p class="weui-toast__content">数据加载中</p>
+		</div>
+	</div>
+
+	<div class="js_dialog" v-if="alert != ''">
+		<div class="weui-mask"></div>
+		<div class="weui-dialog">
+			<div class="weui-dialog__hd"><strong class="weui-dialog__title">{{alert.title ? alert.title:'提示'}}</strong></div>
+			<div class="weui-dialog__bd">{{alert.message}}</div>
+			<div class="weui-dialog__ft">
+
+				<a class="weui-dialog__btn weui-dialog__btn_default"
+				href="javascript:;"
+				v-if="alert.close == 'wx'"
+				@click="wx_close()">关闭</a>
+
+				<a class="weui-dialog__btn weui-dialog__btn_default"
+				href="javascript:;"
+				v-if="alert.close == undefined"
+				@click="alert = ''">关闭</a>
+
+				<a class="weui-dialog__btn weui-dialog__btn_primary"
+				:href="`${alert.jump}`"
+				v-if="alert.jump != undefined">主操作</a>
+			</div>
+		</div>
+	</div>
+
+</div><!--app-->
+
+
+<script>
+var app = new Vue({
+	el: '#app',
+	data:{
+		page: 0,
+		loading: 1,
+		alert: '',
+
+		mchIntegral: LS.mchIntegral,
+
+		list: [],
+		list_active: 0,
+
+	},
+	methods:{
+		toast: function(json){
+			this.alert = json
+		},
+		toast_close: function(){
+			this.alert = ''
+		},
+		wx_close: function(){
+			WeixinJSBridge.invoke('closeWindow',{},function(res){})
+		},
+		debug: function(log){
+			$('.debug').html( $('.debug').html() + log + '<br>' )
+		},
+
+		商品: function(){
+			var _this = this
+
+			var data = {
+	"reqHead":{
+		"clientType":"10",
+		"appVersion":"1.0",
+		"osVersion":"安卓4.2.1",
+		"imei":"设备号",
+		"mobileModel":"S1",
+		"mobileManufacturer":"小米",
+		"identificationCode":"1212312",
+		"lat":"1",
+		"lng":"1",
+		"format":"json",
+		"version":"3.0",
+	},
+	"reqBody":{}
+}
+
+			// 合并对象
+			var obj = Object.assign(
+				JSON.parse(JSON.stringify(data.reqHead)),
+				JSON.parse(JSON.stringify(data.reqBody))
+			)
+
+			// 键排序
+			var keys = Object.keys(obj).sort()
+
+			// 拼接字符
+			var str = ''
+			for (var i = 0; i < keys.length; i++) {
+				var k = keys[i]
+				if(obj[k] == '')continue
+				str += k + obj[k]
+			}
+
+			// 算好加入
+			data.reqHead.sign = md5(str + 'E9WQ3REJ34TG23MC3')
+
+			$.ajax({
+				type: 'POST',
+				url: api + 'zzb/app/good/interface',
+				data: JSON.stringify(data),
+				dataType: 'json',
+				success: function(re){
+
+					if(re.rspHead.retCode == '1'){
+						
+						_this.list = re.rspBody.goodList
+
+					}else{
+						_this.toast({message:re.rspHead.retMsg})
+					}
+				}
+			})
+		},
+		充值: function(){
+			var _this = this
+
+			// console.log('充值商品', this.list[this.list_active])
+			// return
+
+			var 充值商品 = this.list[this.list_active]
+
+			var data = {
+	"reqHead":{
+		"clientType":"10",
+		"appVersion":"1.0",
+		"osVersion":"安卓4.2.1",
+		"imei":"设备号",
+		"mobileModel":"S1",
+		"mobileManufacturer":"小米",
+		"identificationCode":"1212312",
+		"lat":"1",
+		"lng":"1",
+		"format":"json",
+		"version":"3.0",
+	},
+	"reqBody":{
+		"mchId": LS.mchId,
+		"goodId": 充值商品.goodId,
+		"openId": LS.openId
+	}
+}
+
+			// 合并对象
+			var obj = Object.assign(
+				JSON.parse(JSON.stringify(data.reqHead)),
+				JSON.parse(JSON.stringify(data.reqBody))
+			)
+
+			// 键排序
+			var keys = Object.keys(obj).sort()
+
+			// 拼接字符
+			var str = ''
+			for (var i = 0; i < keys.length; i++) {
+				var k = keys[i]
+				if(obj[k] == '')continue
+				str += k + obj[k]
+			}
+
+			// 算好加入
+			data.reqHead.sign = md5(str + 'E9WQ3REJ34TG23MC3')
+
+			$.ajax({
+				type: 'POST',
+				url: api + 'zzb/app/h5MchWechatPurchase/interface',
+				data: JSON.stringify(data),
+				dataType: 'json',
+				success: function(re){
+
+					// _this.debug('正在发起微信支付')
+
+					if(re.rspHead.retCode == '1'){
+						_this.微信支付(re.rspBody.payData)
+					}else{
+						_this.toast({message:re.rspHead.retMsg})
+					}
+				}
+			})
+
+		},
+		微信支付(json){
+			var _this = this
+
+			_this.debug('微信支付的json是：' + JSON.stringify(json))
+
+			// this.单号 = json.orderNo
+
+			WeixinJSBridge.invoke(
+				'getBrandWCPayRequest',
+				{
+					"appId":		json.appid,
+					"timeStamp":	json.timestamp,
+					"nonceStr":		json.noncestr,
+					"package":		json.package,
+					"signType":		json.signType,
+					"paySign":		json.sign
+				},
+				function(re){
+
+					_this.debug('微信支付返回：' + JSON.stringify(re))
+
+					if(re.err_msg == "get_brand_wcpay_request:ok"){
+
+						// _this.debug('微信支付成功了！')
+
+						// _this.debug('检查支付状态循环：' + "_this.检查支付状态('" + json.orderNo + "')")
+
+						// _this.debug(JSON.stringify(json))
+
+						_this.loading = 1
+
+						_this.检查支付状态次数 = 30
+
+						_this.检查支付状态循环 = setInterval(function(){
+							_this.检查支付状态(json.orderNo)
+						}, 1000)
+
+					}else{
+
+						this.loading = 0
+					}
+				}
+			)
+		},
+		检查支付状态: function(单号){
+			var _this = this
+
+			this.debug('检查支付状态：' + 单号 + ' 第' + this.检查支付状态次数 + '次')
+
+			//停止检查 - 次数够
+			if(this.检查支付状态次数 == 0){
+				
+				clearInterval(this.检查支付状态循环)
+				this.loading = 0
+
+				return
+			}
+
+			this.检查支付状态次数--
+
+			var data = {
+	"reqHead":{
+		"clientType":"1",
+		"appVersion":"1.0",
+		"osVersion":"安卓4.2.1",
+		"imei":"设备号",
+		"mobileModel":"S1",
+		"mobileManufacturer":"小米",
+		"identificationCode":"1212312",
+		"lat":"1",
+		"lng":"1",
+		"format":"json",
+		"version":"3.0",
+	},
+	"reqBody":{
+		"orderNo": 单号
+	}
+}
+
+			// 合并对象
+			var obj = Object.assign(
+				JSON.parse(JSON.stringify(data.reqHead)),
+				JSON.parse(JSON.stringify(data.reqBody))
+			)
+
+			// 键排序
+			var keys = Object.keys(obj).sort()
+
+			// 拼接字符
+			var str = ''
+			for (var i = 0; i < keys.length; i++) {
+				var k = keys[i]
+				if(obj[k] == '')continue
+				str += k + obj[k]
+			}
+
+			// 算好加入
+			data.reqHead.sign = md5(str + 'E9WQ3REJ34TG23MC3')
+
+			$.ajax({
+				type: 'POST',
+				url: api + 'zzb/app/payResult/interface',
+				data: JSON.stringify(data),
+				dataType: 'json',
+				success: function(re){
+
+					// console.log(re)
+					_this.debug('payResult返回：' + re.rspBody.resutl)
+
+					if(re.rspBody.resutl == '1'){
+
+						//停止检查
+						clearInterval(_this.检查支付状态循环)
+						_this.loading = 0
+
+						//更新本地积分
+						LS.积分 = LS.积分 + _this.充值积分
+
+						//再次发起购买
+						_this.检验()
+					}
+
+				}
+			})
+
+		},
+	},
+	mounted(){
+		_this = this
+
+		console.log('vue is ready')
+
+
+		this.page = 1
+
+		this.loading = 0
+
+		this.商品()
+
+	}
+})
+</script>
+</body>
+</html>
