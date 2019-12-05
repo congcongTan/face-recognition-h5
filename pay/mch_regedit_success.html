@@ -68,19 +68,23 @@
 			<div class="weui-dialog__bd">{{alert.message}}</div>
 			<div class="weui-dialog__ft">
 
-				<a class="weui-dialog__btn weui-dialog__btn_default"
-				href="javascript:;"
-				v-if="alert.close == 'wx'"
-				@click="wx_close()">关闭</a>
+				<template v-if="alert.close != 'no'">
+					<a class="weui-dialog__btn weui-dialog__btn_default"
+					href="javascript:;"
+					v-if="alert.close == 'wx'"
+					@click="wx_close()">关闭</a>
 
-				<a class="weui-dialog__btn weui-dialog__btn_default"
-				href="javascript:;"
-				v-if="alert.close == undefined"
-				@click="alert = ''">关闭</a>
+					<a class="weui-dialog__btn weui-dialog__btn_default"
+					href="javascript:;"
+					v-if="alert.close == undefined"
+					@click="alert = ''">关闭</a>
+
+				</template>
 
 				<a class="weui-dialog__btn weui-dialog__btn_primary"
 				:href="`${alert.jump}`"
 				v-if="alert.jump != undefined">确定</a>
+
 			</div>
 		</div>
 	</div>
