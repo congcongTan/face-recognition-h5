@@ -120,7 +120,7 @@
 
 				<a class="weui-dialog__btn weui-dialog__btn_primary"
 				:href="`${alert.jump}`"
-				v-if="alert.jump != undefined">主操作</a>
+				v-if="alert.jump != undefined">确定</a>
 			</div>
 		</div>
 	</div>
@@ -159,6 +159,13 @@ var app = new Vue({
 
 		注册: function(){
 			var _this = this
+
+			if( this.a.title == ''
+				|| this.a.mobile == ''
+				|| this.a.identifier == ''
+				|| this.a.password == '' ){
+				return
+			}
 
 			var data = {
 	"reqHead":{

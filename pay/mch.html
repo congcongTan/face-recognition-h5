@@ -135,11 +135,11 @@
 	<div v-if="page == 2" class="page2">
 
 		<div class="weui-navbar">
-			<div class="weui-navbar__item weui-bar__item_on">
-				<a href="mch.html">人脸核验</a>
+			<div class="weui-navbar__item weui-bar__item_on" onclick="location.href='mch.html'">
+				人脸核验
 			</div>
-			<div class="weui-navbar__item">
-				<a href="mch_recharge.html">我要充值</a>
+			<div class="weui-navbar__item" onclick="location.href='mch_recharge.html'">
+				我要充值
 			</div>
 		</div>
 
@@ -188,7 +188,7 @@
 
 				<a class="weui-dialog__btn weui-dialog__btn_primary"
 				:href="`${alert.jump}`"
-				v-if="alert.jump != undefined">主操作</a>
+				v-if="alert.jump != undefined">确定</a>
 			</div>
 		</div>
 	</div>
@@ -338,10 +338,16 @@ var app = new Vue({
 		检验: function(){
 			var _this = this
 
+			if( this.a.realName == ''
+				|| this.a.identityCard == ''
+				|| this.a.liveImg == '' ){
+				return
+			}
+
 			//不够分需要充值
 			var 还剩积分 = ((this.mchIntegral * 100) - (this.mchPayIntegral * 100)) / 100
 			if( 还剩积分 < 0 ){
-				this.toast({message:'积分不足请先充值'})
+				this.toast({message:'余额不足，请先充值',jump:'mch_recharge.html'})
 				return
 			}
 
