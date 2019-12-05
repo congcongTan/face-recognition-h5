@@ -402,8 +402,9 @@ var app = new Vue({
 						_this.ok = 'pass'
 						_this.page = 2
 					}else{
-						// _this.ok = 'error'
-						_this.toast({message:re.rspHead.retMsg})
+						// _this.toast({message:re.rspHead.retMsg})
+						_this.ok = 'error'
+						_this.page = 2
 					}
 
 				}

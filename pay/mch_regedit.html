@@ -24,10 +24,6 @@
 		debug:<br>
 	</div>
 
-	<div class="debug" style="display: none;">
-		debug:<br>
-	</div>
-
 	<div v-if="page == 0">
 		loading ...
 	</div>
@@ -210,11 +206,15 @@ var app = new Vue({
 
 					if(re.rspHead.retCode == '1'){
 
+						// 登录
 						LS.title		= re.rspBody.title
 						LS.identifier	= re.rspBody.identifier
 						LS.mchId		= re.rspBody.mchId
 
-						location.href = 'mch.html'
+						// 记忆
+						LS.success = JSON.stringify(_this.a)
+
+						location.href = 'mch_regedit_success.html'
 
 					}else{
 						_this.toast({message:re.rspHead.retMsg})

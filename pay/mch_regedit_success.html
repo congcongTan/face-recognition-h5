@@ -32,25 +32,42 @@
 
 		<form class="weui-form">
 			<div class="weui-form__text-area">
-				<h2 class="weui-form__title">系统登录</h2>
+				<h2 class="weui-form__title">注册成功</h2>
+				<p class="weui-msg__desc">你注册的资料如下</p>
 			</div>
 			<div class="weui-form__control-area">
 				<div class="weui-cells__group weui-cells__group_form">
 					<div class="weui-cells weui-cells_form">
 
 						<div class="weui-cell">
+							<div class="weui-cell__hd"><label class="weui-label">商户名称</label></div>
+							<div class="weui-cell__bd">
+								<input class="weui-input"
+								type="text" name="title" v-model="a.title" disabled>
+							</div>
+						</div>
+
+						<div class="weui-cell">
+							<div class="weui-cell__hd"><label class="weui-label">手机号码</label></div>
+							<div class="weui-cell__bd">
+								<input class="weui-input"
+								type="number" name="mobile" v-model="a.mobile" disabled>
+							</div>
+						</div>
+
+						<div class="weui-cell">
 							<div class="weui-cell__hd"><label class="weui-label">登录账号</label></div>
 							<div class="weui-cell__bd">
-								<input class="weui-input" placeholder="请输入登录账号"
-								type="text" name="identifier" v-model="a.identifier">
+								<input class="weui-input"
+								type="text" name="identifier" v-model="a.identifier" disabled>
 							</div>
 						</div>
 
 						<div class="weui-cell">
 							<div class="weui-cell__hd"><label class="weui-label">登录密码</label></div>
 							<div class="weui-cell__bd">
-								<input class="weui-input" placeholder="请输入登录密码"
-								type="password" name="password" v-model="a.password">
+								<input class="weui-input"
+								type="text" name="password" v-model="a.password" disabled>
 							</div>
 						</div>
 
@@ -58,18 +75,10 @@
 				</div>
 			</div>
 			<div class="mb30">
-				<a :class="`weui-btn weui-btn_${
-				a.username != '' &&
-				a.password != '' ?
-				'primary':'disabled'}`"
-				href="javascript:;" @click="登录()"
-				>登录</a>
+				<a class="weui-btn weui-btn_primary"
+				href="mch.html"
+				>进入首页</a>
 			</div>
-			<div class="weui-form__tips-area">
-		      	<p class="weui-form__tips">
-		        	<a href="mch_regedit.html">无账号，我要注册</a>
-		      	</p>
-		    </div>
 		</form>
 
 	</div>
@@ -119,6 +128,8 @@ var app = new Vue({
 		alert: '',
 
 		a: {
+			title: '',
+			mobile: '',
 			identifier: '',
 			password: '',
 		}
@@ -137,67 +148,6 @@ var app = new Vue({
 			$('.debug').html( $('.debug').html() + log + '<br>' )
 		},
 
-		登录: function(){
-			var _this = this
-
-			var data = {
-	"reqHead":{
-		"clientType":"1",
-		"appVersion":"1.0",
-		"osVersion":"安卓4.2.1",
-		"imei":"设备号",
-		"mobileModel":"S1",
-		"mobileManufacturer":"小米",
-		"identificationCode":"1212312",
-		"lat":"1",
-		"lng":"1",
-		"format":"json",
-		"version":"3.0",
-	},
-	"reqBody":this.a
-}
-
-			// 合并对象
-			var obj = Object.assign(
-				JSON.parse(JSON.stringify(data.reqHead)),
-				JSON.parse(JSON.stringify(data.reqBody))
-			)
-
-			// 键排序
-			var keys = Object.keys(obj).sort()
-
-			// 拼接字符
-			var str = ''
-			for (var i = 0; i < keys.length; i++) {
-				var k = keys[i]
-				if(obj[k] == '')continue
-				str += k + obj[k]
-			}
-
-			// 算好加入
-			data.reqHead.sign = md5(str + 'E9WQ3REJ34TG23MC3')
-
-			$.ajax({
-				type: 'POST',
-				url: api + 'zzb/app/mchLogin/interface',
-				data: JSON.stringify(data),
-				dataType: 'json',
-				success: function(re){
-
-					if(re.rspHead.retCode == '1'){
-
-						LS.title		= re.rspBody.title
-						LS.identifier	= re.rspBody.identifier
-						LS.mchId		= re.rspBody.mchId
-
-						location.href = 'mch.html'
-
-					}else{
-						_this.toast({message:re.rspHead.retMsg})
-					}
-				}
-			})
-		}
 
 	},
 	mounted(){
@@ -209,6 +159,8 @@ var app = new Vue({
 		this.page = 1
 
 		this.loading = 0
+
+		this.a = JSON.parse(LS.success)
 
 	}
 })
