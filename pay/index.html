@@ -7,12 +7,16 @@
 <meta name="description" content="">
 <meta name="author" content="lightuni.com">
 
-<title>中证宝人脸核验系统</title>
+<title>人脸检验系统</title>
 
 <link rel="stylesheet" href="../css/all.css">
 <script src="../js/all.js"></script>
 
 <style>
+body{
+  background: url(../img/face/bg.jpg) no-repeat;
+  background-size: cover;
+}
 .items{
 	margin-left: -15px;
 }
@@ -45,7 +49,6 @@ body{
 }
 .item .right{
 	float: right;
-	margin-top: 5px;
 }
 </style>
 </head>
@@ -71,12 +74,15 @@ body{
 
 			<div class="items">
 				<div class="item" onclick="location.href='member.html?mchId=7c7467df8ca64764809f784e211637c7'">
-					<div class="right">个人用户专用 &gt;</div>
+					<div class="right" style="margin-top:35px;">&gt;</div>
 					<div class="left">个人版</div>
+					<div class="mt10">临时用户每次核验成功收费1元<br>
+					限当天有效。</div>
 				</div>
 				<div class="item" onclick="location.href='mch_login.html'">
-					<div class="right">企业用户专用 &gt;</div>
+					<div class="right" style="margin-top:20px;">&gt;</div>
 					<div class="left">专业版</div>
+					<div class="mt10">专业用户专用，充值100送20。</div>
 				</div>
 			</div>
 
