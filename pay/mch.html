@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=0.9, user-scalable=no">
-<meta name="keyword" content="">
-<meta name="description" content="">
-<meta name="author" content="lightuni.com">
+
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Cache" content="no-cache">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 
 <title>人脸检验系统</title>
 
@@ -102,21 +104,17 @@
 						<div class="weui-cells weui-cells_form">
 							<div class="weui-cell">
 								<div class="weui-cell__bd">
-									<div class="weui-uploader">
-										<div class="weui-uploader__bd">
 
-											<label v-if="a.liveImgCode == ''">
-												<img src="../img/input-upload.gif" width="100" height="100">
-												<input type="file" style="display:none" accept="image/*"
-												id="upload_input" @change="选图()">
-											</label>
+									<label v-if="a.liveImgCode == ''">
+										<img src="../img/input-upload.gif" width="100" height="100">
+										<input type="file" style="display:none" accept="image/*"
+										id="upload_input" @change="选图()">
+									</label>
 
-											<img :src="`${a.liveImgCode}`" width="100" height="100" v-if="a.liveImgCode != ''">
+									<img :src="`${a.liveImgCode}`" width="100" height="100" v-if="a.liveImgCode != ''">
 
-											<div class="img-placeholder">真人或照片</div>
+									<div class="img-placeholder">真人或照片</div>
 
-										</div>
-									</div>
 								</div>
 							</div>
 						</div>

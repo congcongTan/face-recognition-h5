@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=0.9, user-scalable=no">
-<meta name="keyword" content="">
-<meta name="description" content="">
-<meta name="author" content="lightuni.com">
+
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Cache" content="no-cache">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 
 <title>人脸检验系统</title>
 
@@ -344,6 +346,12 @@ var app = new Vue({
 		},
 		检验: function(){
 			var _this = this
+
+			if( this.a.realName == ''
+				|| this.a.identityCard == ''
+				|| this.a.liveImg == '' ){
+				return
+			}
 
 			//不够分需要充值
 			var 还剩积分 = ((LS.积分 * 100) - (LS.扣除积分 * 100)) / 100
