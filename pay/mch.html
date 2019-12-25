@@ -202,8 +202,8 @@
 				</template>
 
 				<a class="weui-dialog__btn weui-dialog__btn_primary"
-				:href="`${alert.jump}`"
-				v-if="alert.jump != undefined">确定</a>
+				:href="`${alert.ok_url}`"
+				v-if="alert.ok_url != undefined">{{alert.ok_title ? alert.ok_title:'确定'}}</a>
 
 			</div>
 		</div>
@@ -363,7 +363,7 @@ var app = new Vue({
 			//不够分需要充值
 			var 还剩积分 = ((this.mchIntegral * 100) - (this.mchPayIntegral * 100)) / 100
 			if( 还剩积分 < 0 ){
-				this.toast({message:'余额不足，请先充值',jump:'mch_recharge.html'})
+				this.toast({message:'余额不足，请先充值',ok_url:'mch_recharge.html'})
 				return
 			}
 

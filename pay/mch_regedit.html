@@ -106,8 +106,8 @@
 				</template>
 
 				<a class="weui-dialog__btn weui-dialog__btn_primary"
-				:href="`${alert.jump}`"
-				v-if="alert.jump != undefined">确定</a>
+				:href="`${alert.ok_url}`"
+				v-if="alert.ok_url != undefined">{{alert.ok_title ? alert.ok_title:'确定'}}</a>
 
 			</div>
 		</div>
@@ -125,7 +125,7 @@ var app = new Vue({
 		alert: '',
 
 		a: {
-			mobile: '',
+			mobile: getUrl('mobile'),
 			code: '',
 		},
 

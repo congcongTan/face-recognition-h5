@@ -106,8 +106,8 @@
 				</template>
 
 				<a class="weui-dialog__btn weui-dialog__btn_primary"
-				:href="`${alert.jump}`"
-				v-if="alert.jump != undefined">确定</a>
+				:href="`${alert.ok_url}`"
+				v-if="alert.ok_url != undefined">{{alert.ok_title ? alert.ok_title:'确定'}}</a>
 
 			</div>
 		</div>
@@ -212,7 +212,7 @@ var app = new Vue({
 				success: function(re){
 
 					if(re.rspHead.retMsg == '商户不存在'){
-						_this.toast({message:'该商户未注册'})
+						_this.toast({message:'该商户未注册',ok_url:'mch_regedit.html?mobile=' + _this.a.mobile,ok_title:'去注册'})
 						return
 					}
 
