@@ -164,32 +164,24 @@ var app = new Vue({
 				return
 			}
 
-			$('.weui-vcode-btn').prop('disabled', true)
-
-			this.倒计时fn()
-			this.倒计时运行 = setInterval(function(){
-				_this.倒计时fn()
-			}, 1000)
-
-
+			//先检查有否商户
 			var data = {
-    "reqHead": {
-        "clientType": 1,
-        "appVersion": "1.0",
-        "osVersion": "安卓4.2.1",
-        "imei": "设备号",
-        "mobileModel": "S1",
-        "mobileManufacturer": "小米",
-        "identificationCode": "KSJALFAJIEALJF1212321",
-        "lat": "1",
-        "lng": "1",
-        "format": "json",
-        "version": "3.0",
-    },
-    "reqBody":{
-        "mobile": this.a.mobile,
-        "type": "7"
-    }
+	"reqHead":{
+		"clientType":"10",
+		"appVersion":"1.0",
+		"osVersion":"安卓4.2.1",
+		"imei":"设备号",
+		"mobileModel":"S1",
+		"mobileManufacturer":"小米",
+		"identificationCode":"1212312",
+		"lat":"1",
+		"lng":"1",
+		"format":"json",
+		"version":"3.0",
+	},
+	"reqBody": {
+		identifier: this.a.mobile
+	}
 }
 
 			// 合并对象
@@ -211,22 +203,85 @@ var app = new Vue({
 
 			// 算好加入
 			data.reqHead.sign = md5(str + 'E9WQ3REJ34TG23MC3')
-			// console.log(str + 'E9WQ3REJ34TG23MC3')
-			// console.log(data)
 
 			$.ajax({
 				type: 'POST',
-				url: api + 'zzb/app/sendSms/interface',
+				url: api + 'zzb/app/h5MchInfo/interface',
 				data: JSON.stringify(data),
 				dataType: 'json',
 				success: function(re){
 
-					if(re.rspHead.retCode == '1'){
-
-						_this.toast({message:'验证码已发送'})
-					}else{
-						_this.toast({message:re.rspHead.retMsg})
+					if(re.rspHead.retMsg == '商户不存在'){
+						_this.toast({message:'该商户未注册'})
+						return
 					}
+
+					$('.weui-vcode-btn').prop('disabled', true)
+
+					_this.倒计时fn()
+					_this.倒计时运行 = setInterval(function(){
+						_this.倒计时fn()
+					}, 1000)
+
+
+					var data = {
+		    "reqHead": {
+		        "clientType": 1,
+		        "appVersion": "1.0",
+		        "osVersion": "安卓4.2.1",
+		        "imei": "设备号",
+		        "mobileModel": "S1",
+		        "mobileManufacturer": "小米",
+		        "identificationCode": "KSJALFAJIEALJF1212321",
+		        "lat": "1",
+		        "lng": "1",
+		        "format": "json",
+		        "version": "3.0",
+		    },
+		    "reqBody":{
+		        "mobile": _this.a.mobile,
+		        "type": "7"
+		    }
+		}
+
+					// 合并对象
+					var obj = Object.assign(
+						JSON.parse(JSON.stringify(data.reqHead)),
+						JSON.parse(JSON.stringify(data.reqBody))
+					)
+
+					// 键排序
+					var keys = Object.keys(obj).sort()
+
+					// 拼接字符
+					var str = ''
+					for (var i = 0; i < keys.length; i++) {
+						var k = keys[i]
+						if(obj[k] == '')continue
+						str += k + obj[k]
+					}
+
+					// 算好加入
+					data.reqHead.sign = md5(str + 'E9WQ3REJ34TG23MC3')
+					// console.log(str + 'E9WQ3REJ34TG23MC3')
+					// console.log(data)
+
+					$.ajax({
+						type: 'POST',
+						url: api + 'zzb/app/sendSms/interface',
+						data: JSON.stringify(data),
+						dataType: 'json',
+						success: function(re){
+
+							if(re.rspHead.retCode == '1'){
+
+								_this.toast({message:'验证码已发送'})
+							}else{
+								_this.toast({message:re.rspHead.retMsg})
+							}
+						}
+					})
+
 				}
 			})
 
