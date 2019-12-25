@@ -472,118 +472,13 @@ var app = new Vue({
 
 		//清缓存
 		if(getUrl('clean') != undefined){
-			LS.removeItem('memberId')
-			LS.removeItem('openId')
-			LS.removeItem('userId')
 			LS.removeItem('title')
 			LS.removeItem('identifier')
 			LS.removeItem('mchId')
-			LS.removeItem('mchIntegral')
+			LS.removeItem('商户号')
 			return
 		}
 
-		//未登录
-		if(LS.openId == undefined){
-
-			//step1 无code
-			if(getUrl('code') == undefined){
-				// console.log(location.href)
-				var url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + appid + '&redirect_uri=' + encodeURIComponent(location.href) + '&response_type=code&scope=snsapi_base#wechat_redirect'
-
-				// console.log(url)
-				// return
-
-				location.href = url
-				return
-			}
-
-		}
-
-
-		//用户信息
-		var body = {
-			source: 2,
-			paramId: '',
-			code: ''
-		}
-		if(LS.openId != undefined){
-
-			//有openid 用 openid
-			body.paramId = LS.openId
-
-		}else if(getUrl('code') != null){
-
-			//无openid 用 code
-			body.code = getUrl('code')
-		}
-
-		if( !(body.paramId == '' && body.code == '') ){
-
-			// alert(body.paramId + ' | ' + body.code)
-			
-			var data = {
-	"reqHead":{
-		"clientType":"10",
-		"appVersion":"1.0",
-		"osVersion":"安卓4.2.1",
-		"imei":"设备号",
-		"mobileModel":"S1",
-		"mobileManufacturer":"小米",
-		"identificationCode":"1212312",
-		"lat":"1",
-		"lng":"1",
-		"format":"json",
-		"version":"3.0",
-	},
-	"reqBody": body
-}
-
-			// 合并对象
-			var obj = Object.assign(
-				JSON.parse(JSON.stringify(data.reqHead)),
-				JSON.parse(JSON.stringify(data.reqBody))
-			)
-
-			// 键排序
-			var keys = Object.keys(obj).sort()
-
-			// 拼接字符
-			var str = ''
-			for (var i = 0; i < keys.length; i++) {
-				var k = keys[i]
-				if(obj[k] == '')continue
-				str += k + obj[k]
-			}
-
-			// 算好加入
-			data.reqHead.sign = md5(str + 'E9WQ3REJ34TG23MC3')
-
-
-			$.ajax({
-				type: 'POST',
-				url: api + 'zzb/app/h5UserInfo/interface',
-				data: JSON.stringify(data),
-				dataType: 'json',
-				success: function(re){
-					if(re.rspHead.retCode == '1'){
-
-						// LS.积分		= re.rspBody.integral
-						LS.openId	= re.rspBody.openId
-						LS.memberId	= re.rspBody.memberId
-						LS.userId	= re.rspBody.userId
-
-						//更新积分
-						// _this.积分 = LS.积分
-
-						//上次失败这次免费
-						// _this.本次收费 = re.rspBody.lastAuthStatus
-
-					}else{
-						_this.toast({message:re.rspHead.retMsg})
-					}
-				}
-			})
-		}
 
 		// 商户信息
 		if( LS.mchId == undefined ){

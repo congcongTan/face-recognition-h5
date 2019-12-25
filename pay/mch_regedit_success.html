@@ -14,9 +14,7 @@
 <link rel="stylesheet" href="../css/all.css">
 <script src="../js/all.js"></script>
 
-<style>
-
-</style>
+<meta http-equiv="refresh" content="5; url=mch.html">
 </head>
 <body>
 
@@ -32,25 +30,18 @@
 
 	<div v-if="page == 1">
 
-		<div style="margin: 30px;">
-
-			<div style="margin-bottom: 10px; font-size: 24px;">注册成功，你注册的资料如下</div>
-
-			<div style="line-height: 250%">
-				商户名称：{{a.title}}<br>
-				手机号码：{{a.mobile}}<br>
-				登录账号：{{a.identifier}}<br>
-				登录密码：{{a.password}}<br>
-			</div>
-
-			<hr style="margin: 15px 0 20px;">
-
-			<div>
-				<a class="weui-btn weui-btn_primary"
-				href="mch.html"
-				>进入首页</a>
-			</div>
-		</div>
+		<div class="weui-msg">
+	        <div class="weui-msg__icon-area"><i class="weui-icon-success weui-icon_msg"></i></div>
+	        <div class="weui-msg__text-area">
+	            <h2 class="weui-msg__title">注册成功</h2>
+	            <p class="weui-msg__desc">即将进入专业版认证首页</p>
+	        </div>
+	        <div class="weui-msg__opr-area">
+	            <p class="weui-btn-area">
+	                <a href="mch.html" class="weui-btn weui-btn_primary">立即进入</a>
+	            </p>
+	        </div>
+	    </div>
 
 	</div>
 
