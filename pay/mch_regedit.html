@@ -31,7 +31,7 @@
 
 		<form class="weui-form">
 			<div class="weui-form__text-area">
-				<h2 class="weui-form__title">注册新账号</h2>
+				<h2 class="weui-form__title">系统登录</h2>
 			</div>
 			<div class="weui-form__control-area">
 				<div class="weui-cells__group weui-cells__group_form">
@@ -64,14 +64,9 @@
 				a.mobile != '' &&
 				a.code != '' ?
 				'primary':'disabled'}`"
-				href="javascript:;" @click="注册()"
-				>注册</a>
+				href="javascript:;" @click="提交()"
+				>提交</a>
 			</div>
-			<div class="weui-form__tips-area">
-		      	<p class="weui-form__tips">
-		        	<a href="mch_login.html">已有账号，我要登录</a>
-		      	</p>
-		    </div>
 		</form>
 
 	</div>
@@ -226,6 +221,7 @@ var app = new Vue({
 
 						_this.toast({message:'验证码已发送'})
 					}else{
+						_this.倒计时 = 0
 						_this.toast({message:re.rspHead.retMsg})
 					}
 				}
@@ -253,7 +249,7 @@ var app = new Vue({
 
 		},
 
-		注册: function(){
+		提交: function(){
 			var _this = this
 
 			if( this.a.mobile == ''
@@ -333,8 +329,6 @@ var app = new Vue({
 						LS.identifier	= re.rspBody.identifier
 						LS.mchId		= re.rspBody.mchId
 
-						// 记忆
-						// LS.success = JSON.stringify(_this.a)
 
 						location.href = 'mch_regedit_success.html'
 

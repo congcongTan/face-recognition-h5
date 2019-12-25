@@ -93,12 +93,6 @@ var app = new Vue({
 		loading: 1,
 		alert: '',
 
-		a: {
-			title: '',
-			mobile: '',
-			identifier: '',
-			password: '',
-		}
 	},
 	methods:{
 		toast: function(json){
@@ -125,9 +119,6 @@ var app = new Vue({
 		this.page = 1
 
 		this.loading = 0
-
-		this.a = JSON.parse(LS.success)
-
 	}
 })
 </script>
