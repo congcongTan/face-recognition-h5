@@ -9,7 +9,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>人脸检验系统</title>
+<title>人脸核验系统</title>
 
 <link rel="stylesheet" href="../css/all.css">
 <script src="../js/all.js"></script>
@@ -31,7 +31,7 @@
 
 		<form class="weui-form">
 			<div class="weui-form__text-area">
-				<h2 class="weui-form__title">系统登录</h2>
+				<h2 class="weui-form__title">注册新用户</h2>
 			</div>
 			<div class="weui-form__control-area">
 				<div class="weui-cells__group weui-cells__group_form">
@@ -42,6 +42,14 @@
 							<div class="weui-cell__bd">
 								<input class="weui-input" placeholder="请输入手机号"
 								type="number" name="mobile" v-model="a.mobile">
+							</div>
+						</div>
+
+						<div class="weui-cell">
+							<div class="weui-cell__hd"><label class="weui-label">登录密码</label></div>
+							<div class="weui-cell__bd">
+								<input class="weui-input" placeholder="请输入登录密码"
+								type="password" name="password" v-model="a.password">
 							</div>
 						</div>
 
@@ -62,12 +70,17 @@
 			<div class="mb30">
 				<a :class="`weui-btn weui-btn_${
 				a.mobile != '' &&
+				a.password != '' &&
 				a.code != '' ?
 				'primary':'disabled'}`"
-				href="javascript:;" @click="提交()"
-				>提交</a>
+				href="javascript:;" @click="注册并登录()"
+				>注册并登录</a>
 			</div>
 		</form>
+
+		<div class="tc">
+			<a href="mch_login.html">已有账号，去登录</a>
+		</div>
 
 	</div>
 
@@ -120,7 +133,8 @@ var app = new Vue({
 		alert: '',
 
 		a: {
-			mobile: getUrl('mobile'),
+			mobile: '',
+			password: '',
 			code: '',
 		},
 
@@ -153,6 +167,14 @@ var app = new Vue({
 
 			if(this.a.mobile == ''){
 				_this.toast({message:'请输入手机号'})
+				return
+			}
+			else if(this.a.password == ''){
+				_this.toast({message:'请输入密码'})
+				return
+			}
+			else if(this.a.password.length < 3 || this.a.password.length > 32){
+				_this.toast({message:'密码长度需在3-32位间'})
 				return
 			}
 			else if(! /^1(3|4|5|6|7|8|9)\d{9}$/.test(this.a.mobile)){
@@ -249,20 +271,21 @@ var app = new Vue({
 
 		},
 
-		提交: function(){
+		注册并登录: function(){
 			var _this = this
 
 			if( this.a.mobile == ''
+				|| this.a.passowrd == ''
 				|| this.a.code == '' ){
 				return
 			}
 
-			if(this.a.mobile == ''){
-				_this.toast({message:'请输入手机号'})
+			if(! /^1(3|4|5|6|7|8|9)\d{9}$/.test(this.a.mobile)){
+				_this.toast({message:'手机号应为11位数字'})
 				return
 			}
-			else if(! /^1(3|4|5|6|7|8|9)\d{9}$/.test(this.a.mobile)){
-				_this.toast({message:'手机号应为11位数字'})
+			else if(this.a.password.length < 3 || this.a.password.length > 32){
+				_this.toast({message:'密码长度需在3-32位间'})
 				return
 			}
 			else if(! /^\d{6}$/.test(this.a.code)){
@@ -288,7 +311,7 @@ var app = new Vue({
 		title: this.a.mobile,
 		mobile: this.a.mobile,
 		identifier: this.a.mobile,
-		password: "123456",
+		password: this.a.password,
 		code: this.a.code
 	}
 }
@@ -312,7 +335,7 @@ var app = new Vue({
 
 			// 算好加入
 			data.reqHead.sign = md5(str + 'E9WQ3REJ34TG23MC3')
-			console.log(str + 'E9WQ3REJ34TG23MC3')
+			// console.log(str + 'E9WQ3REJ34TG23MC3')
 			// console.log(data)
 
 			$.ajax({
