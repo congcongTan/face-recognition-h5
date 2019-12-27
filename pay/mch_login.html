@@ -23,10 +23,6 @@
 		debug:<br>
 	</div>
 
-	<div class="debug" style="display: none;">
-		debug:<br>
-	</div>
-
 	<div v-if="page == 0">
 		loading ...
 	</div>
@@ -68,7 +64,7 @@
 				href="javascript:;" @click="登录()"
 				>登录</a>
 			</div>
-			<div class="tc">
+			<div class="m30 tr">
 				<a href="mch_forget.html">忘记密码</a>&nbsp;&nbsp;
 				<a href="mch_vcode.html">验证码登录</a>&nbsp;&nbsp;
 				<a href="mch_regedit.html">注册新用户</a>
@@ -126,7 +122,7 @@ var app = new Vue({
 		alert: '',
 
 		a: {
-			mobile: '',
+			mobile: getUrl('mobile'),
 			password: '',
 		}
 	},
@@ -161,9 +157,11 @@ var app = new Vue({
 				return
 			}
 
+
+			//检查是否已注册
 			var data = {
 	"reqHead":{
-		"clientType":"1",
+		"clientType":"10",
 		"appVersion":"1.0",
 		"osVersion":"安卓4.2.1",
 		"imei":"设备号",
@@ -175,7 +173,9 @@ var app = new Vue({
 		"format":"json",
 		"version":"3.0",
 	},
-	"reqBody":this.a
+	"reqBody":{
+		identifier: this.a.mobile,
+	}
 }
 
 			// 合并对象
@@ -202,25 +202,87 @@ var app = new Vue({
 
 			$.ajax({
 				type: 'POST',
-				url: api + 'zzb/app/mchPasswordLogin/interface',
+				url: api + 'zzb/app/h5MchInfo/interface',
 				data: JSON.stringify(data),
 				dataType: 'json',
 				success: function(re){
 
-					if(re.rspHead.retCode == '1'){
+					if(re.rspHead.retMsg == '商户不存在'){
 
-						LS.title		= re.rspBody.title
-						LS.identifier	= re.rspBody.identifier
-						LS.mchId		= re.rspBody.mchId
-						LS.mchIntegral	= re.rspBody.mchIntegral
-
-						location.href = 'mch.html'
+						_this.toast({
+							message:	'该手机号未注册',
+							ok_title:	'去注册',
+							ok_url:		'mch_regedit.html?mobile=' + _this.a.mobile
+						})
 
 					}else{
-						_this.toast({message:re.rspHead.retMsg})
+
+						//现在才去登录
+						var data = {
+	"reqHead":{
+		"clientType":"1",
+		"appVersion":"1.0",
+		"osVersion":"安卓4.2.1",
+		"imei":"设备号",
+		"mobileModel":"S1",
+		"mobileManufacturer":"小米",
+		"identificationCode":"1212312",
+		"lat":"1",
+		"lng":"1",
+		"format":"json",
+		"version":"3.0",
+	},
+	"reqBody":_this.a
+}
+
+						// 合并对象
+						var obj = Object.assign(
+							JSON.parse(JSON.stringify(data.reqHead)),
+							JSON.parse(JSON.stringify(data.reqBody))
+						)
+
+						// 键排序
+						var keys = Object.keys(obj).sort()
+
+						// 拼接字符
+						var str = ''
+						for (var i = 0; i < keys.length; i++) {
+							var k = keys[i]
+							if(obj[k] == '')continue
+							str += k + obj[k]
+						}
+
+						// 算好加入
+						data.reqHead.sign = md5(str + 'E9WQ3REJ34TG23MC3')
+						// console.log(str + 'E9WQ3REJ34TG23MC3')
+						// console.log(data)
+
+						$.ajax({
+							type: 'POST',
+							url: api + 'zzb/app/mchPasswordLogin/interface',
+							data: JSON.stringify(data),
+							dataType: 'json',
+							success: function(re){
+
+								if(re.rspHead.retCode == '1'){
+
+									LS.title		= re.rspBody.title
+									LS.identifier	= re.rspBody.identifier
+									LS.mchId		= re.rspBody.mchId
+									LS.mchIntegral	= re.rspBody.mchIntegral
+
+									location.href = 'mch.html'
+
+								}else{
+									_this.toast({message:re.rspHead.retMsg})
+								}
+							}
+						})
+
 					}
 				}
 			})
+
 		}
 
 	},
